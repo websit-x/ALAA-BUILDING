@@ -63,15 +63,16 @@ html[lang=ar] *{letter-spacing:0!important}
 .btn:hover{background:var(--p2);border-color:rgba(255,255,255,.35);transform:translateY(-2px)}
 .btn.pri{background:var(--or);color:#140a02;border-color:var(--or)}
 .btn.pri:hover{background:#ff9140;box-shadow:0 10px 36px rgba(255,122,26,.3)}
-.cta{display:flex;flex-wrap:wrap;gap:10px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .chip{display:inline-block;font:600 .78rem 'Cairo';padding:4px 12px;border-radius:8px;border:1px solid var(--line);background:var(--p1);color:#d2d2d6}
 
-/* hero */
-.hero{min-height:100svh;display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding-top:110px;padding-bottom:60px}
-.hero .lead{margin:18px 0 18px}
-.note{display:inline-flex;gap:8px;align-items:center;color:#d8d8dc;font-size:.85rem;border:1px dashed rgba(255,122,26,.5);background:rgba(255,122,26,.07);padding:6px 14px;border-radius:10px;margin-bottom:24px}
-.hv{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#16181c;box-shadow:0 40px 80px rgba(0,0,0,.55); position: relative;}
-.hv video { display: block; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16/10; }
+/* hero (Full Screen Video Background) */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 20px 60px;overflow:hidden;width:100%}
+.hero-vid{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.hero-over{position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,14,16,0.65) 0%, var(--bg) 100%);z-index:-1}
+.hero .lead{margin:18px auto 24px;max-width:680px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.hero .display span{display:inline-block;margin:0 6px;text-shadow:0 4px 12px rgba(0,0,0,0.6)}
+.note{display:inline-flex;gap:8px;align-items:center;color:#d8d8dc;font-size:.85rem;border:1px dashed rgba(255,122,26,.5);background:rgba(255,122,26,.15);padding:6px 14px;border-radius:10px;margin-bottom:24px;justify-content:center;backdrop-filter:blur(4px)}
 
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:10px}
 .st{border:1px solid var(--line);border-radius:18px;background:var(--p1);padding:18px 22px}
@@ -151,7 +152,7 @@ footer{max-width:1120px;margin:80px auto 0;padding:26px 20px 40px;border-top:1px
 footer a:hover{color:#fff}
 
 @media(max-width:900px){
- .hero{grid-template-columns:1fr;padding-top:100px;gap:20px}
+ .hero{padding-top:100px;gap:20px}
  .mbox{grid-template-columns:1fr}.vw{border-inline-end:none;border-bottom:1px solid var(--line)}
 }
 @media(max-width:720px){
@@ -194,21 +195,19 @@ footer a:hover{color:#fff}
 </header>
 
 <main>
-<section id="home" class="sec hero">
-  <div>
+<!-- Hero Section with Full Background Video -->
+<section id="home" class="hero">
+  <video class="hero-vid" autoplay loop muted playsinline>
+    <source src="video_14959146249537651817_y.mp4" type="video/mp4">
+  </video>
+  <div class="hero-over"></div>
+  
+  <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; width:100%; max-width:900px; margin:0 auto;">
     <span class="eyebrow rv" data-i18n="eyebrow"></span>
     <h2 class="display rv" style="--i:1"><span data-i18n="h1a"></span><span class="o" data-i18n="h1b"></span></h2>
     <p class="lead rv" style="--i:2" data-i18n="lead"></p>
     <div class="note rv" style="--i:3">▣ <span data-i18n="scope"></span></div>
     <div class="cta rv" style="--i:4"><a class="btn pri" href="#projects" data-i18n="ctaProj"></a><a class="btn" href="#contact" data-i18n="ctaQuote"></a></div>
-  </div>
-  <div class="rv" style="--i:2">
-    <!-- تم إزالة الرسم واستبداله بالفيديو هنا -->
-    <div class="hv">
-      <video autoplay loop muted playsinline>
-        <source src="video_14959146249537651817_y.mp4" type="video/mp4">
-      </video>
-    </div>
   </div>
 </section>
 
