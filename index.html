@@ -169,6 +169,8 @@ footer a:hover{color:#fff}
  .stats{grid-template-columns:1fr}.cg{grid-template-columns:1fr}.sec{padding-top:88px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{position:absolute;width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:spin .8s linear infinite;z-index:1}
 </style>
 </head>
 <body class="lock">
@@ -319,7 +321,7 @@ const FB={apiKey:"AIzaSyCu-ZLIqFgvZSEm8KSn7Seh1X9lnHhGSh0",authDomain:"shop-clot
 const TG_TOKEN="9242734114:AAGLI4dhUGnR4EgTm9aqN-7wjbNB6tYTl9k";
 const tgCache=new Map();
 async function getTgUrl(fileId){
-  if(!fileId)return 'youcef.png';
+  if(!fileId)return '';
   if(tgCache.has(fileId))return tgCache.get(fileId);
   try{
     const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getFile?file_id=${fileId}`);
@@ -329,7 +331,7 @@ async function getTgUrl(fileId){
       tgCache.set(fileId,url);return url;
     }
   }catch(e){console.error("Error fetching TG img",e)}
-  return 'youcef.png';
+  return '';
 }
 
 let PROJECTS=[];
@@ -453,9 +455,9 @@ async function renderCards(){
   if(!PROJECTS.length){$('#pgrid').innerHTML='';return}
   let html='';
   for(let i=0;i<PROJECTS.length;i++){
-    const p=PROJECTS[i];let thumb='youcef.png';
+    const p=PROJECTS[i];let thumb='';
     if(p.photos&&p.photos.length>0)thumb=await getTgUrl(p.photos[0]);
-    html+=`<button class="pc rv in" data-i="${i}"><div class="th"><img src="${esc(thumb)}" alt=""><span class="tag">${p.levels||0} ${T.floors}</span></div>
+    html+=`<button class="pc rv in" data-i="${i}"><div class="th"><i class="spin"></i><img src="${esc(thumb)}" alt="" onload="this.style.opacity=1" style="opacity:0;transition:opacity .4s;position:relative;z-index:2"><span class="tag" style="z-index:3">${p.levels||0} ${T.floors}</span></div>
     <div class="bd"><h3>${esc(p.t?p.t[lang]:'')}</h3><div class="m">${esc(p.loc?p.loc[lang]:'')}</div><div class="rt" data-pid="${esc(p.id)}"></div><span class="go">${T.open}</span></div></button>`;
   }
   if(tok!==rcTok)return; // a newer render started, drop this one
@@ -479,16 +481,16 @@ async function setStage(s){
   const p=PROJECTS[cur];if(!p)return;
   const n=p.photos?p.photos.length:0;
   if(n===0){
-    $('#view').innerHTML=`<img src="youcef.png" alt="">`;
+    $('#view').innerHTML=`<i class="spin"></i>`;
     $('#rng').max=0;$('#rng').value=0;$('#dots').innerHTML='';$('#slabel').textContent='';
     return;
   }
   stg=Math.max(0,Math.min(n-1,s));
   const my=cur,mine=stg;
-  $('#view').innerHTML=`<span class="badge">${stg+1} / ${n}</span><img src="youcef.png" id="mainImg" style="opacity:.3;">`;
+  $('#view').innerHTML=`<span class="badge" style="z-index:3">${stg+1} / ${n}</span><i class="spin"></i><img src="" id="mainImg" onload="this.style.opacity=1" style="opacity:0;transition:opacity .4s;position:relative;z-index:2">`;
   const url=await getTgUrl(p.photos[stg]);
   const imgEl=document.getElementById('mainImg');
-  if(imgEl&&cur===my&&stg===mine){imgEl.src=url;imgEl.style.opacity=1}
+  if(imgEl&&cur===my&&stg===mine){imgEl.src=url;}
   $('#slabel').textContent=D().photoLbl+" "+(stg+1);
   $('#rng').max=n-1;$('#rng').value=stg;
   $$('#dots button').forEach((b,i)=>{b.classList.toggle('on',i===stg);b.classList.toggle('past',i<stg)});
