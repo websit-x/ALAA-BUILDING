@@ -83,8 +83,8 @@ input:focus{border-color:var(--or)}
           <button type="button" class="btn ghost" id="convertBtn" style="display:none; color:#6be08a; border-color:#6be08a;">⚙️ تحويل الصور لتلغرام</button>
           <span class="count" id="count">لم تُختَر صور بعد</span>
         </div>
-        <input type="file" id="photos" multiple accept="image/*" hidden>
-        <div class="hint">اختر عدة صور معاً. يمكنك ترتيبها (▲/▼) أو حذفها (✕) قبل النشر.</div>
+        <input type="file" id="photos" multiple accept="image/*,.heic,.heif" hidden>
+        <div class="hint">اختر عدة صور معاً. يمكنك ترتيبها (▲/▼) أو حذفها (✕) قبل النشر. (صور الآيفون مدعومة).</div>
         <div class="thumbs" id="thumbs"></div>
       </div>
 
@@ -106,6 +106,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// إضافة مكتبة قراءة صور الآيفون (HEIC)
+import heic2any from "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/+esm";
+
 const firebaseConfig={apiKey:"AIzaSyCu-ZLIqFgvZSEm8KSn7Seh1X9lnHhGSh0",authDomain:"shop-clothes-224a3.firebaseapp.com",projectId:"shop-clothes-224a3"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 
@@ -120,11 +123,7 @@ const AUTH_ERR={
   'auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.',
   'auth/wrong-password':'كلمة المرور غير صحيحة.',
   'auth/user-not-found':'هذا الحساب غير موجود.',
-  'auth/invalid-email':'صيغة البريد غير صحيحة.',
-  'auth/too-many-requests':'محاولات كثيرة، انتظر قليلاً.',
-  'auth/network-request-failed':'لا يوجد اتصال بالإنترنت.',
-  'auth/operation-not-allowed':'تسجيل الدخول بالبريد غير مفعّل في Firebase.',
-  'auth/operation-not-supported-in-this-environment':'افتح الصفحة من رابط https (وليس من ملف على الهاتف).'
+  'auth/invalid-email':'صيغة البريد غير صحيحة.'
 };
 let unsub=null;
 onAuthStateChanged(auth,user=>{
@@ -140,7 +139,7 @@ $('loginForm').addEventListener('submit',async e=>{
   e.preventDefault();const b=$('loginBtn'),m=$('loginMsg');
   b.disabled=true;b.textContent='جاري التحقق...';m.textContent='';
   try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('pwd').value)}
-  catch(err){console.error(err);m.textContent=(AUTH_ERR[err.code]||'تعذّر الدخول')+' ['+(err.code||err.message)+']'}
+  catch(err){console.error(err);m.textContent=(AUTH_ERR[err.code]||'تعذّر الدخول')}
   b.disabled=false;b.textContent='دخول';
 });
 $('logoutBtn').addEventListener('click',()=>signOut(auth));
@@ -159,36 +158,30 @@ function loadProjects(){
       const del=document.createElement('button');del.className='btn danger sm';del.textContent='حذف';del.dataset.id=d.id;
       row.append(info,del);list.appendChild(row);
     });
-  },err=>{console.error(err);$('projectsList').innerHTML='<p class="err" style="text-align:center">تعذّر تحميل المشاريع: '+(err.code||err.message)+'</p>'});
+  });
 }
 
-/* ---------- delete (project + telegram messages, result verified) ---------- */
+/* ---------- delete ---------- */
 $('projectsList').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
-  if(!confirm('هل أنت متأكد من حذف هذا المشروع؟ ستُحذف صوره من تلغرام أيضاً.'))return;
-  const orig=b.textContent;b.disabled=true;b.textContent='جاري الحذف...';
+  if(!confirm('هل أنت متأكد من حذف هذا المشروع؟'))return;
+  b.disabled=true;b.textContent='جاري الحذف...';
   try{
     const ref=doc(db,'projects',b.dataset.id),snap=await getDoc(ref);
-    let failed=0;
     if(snap.exists()){
-      const ids=snap.data().tg_message_ids||[];
-      for(const msgId of ids){
+      for(const msgId of snap.data().tg_message_ids||[]){
         try{
-          const r=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/deleteMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,message_id:msgId})});
-          const j=await r.json();if(!j.ok)failed++;
-        }catch(err){failed++}
-        await sleep(400);
+          await fetch(`https://api.telegram.org/bot${TG_TOKEN}/deleteMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,message_id:msgId})});
+        }catch(e){}
       }
     }
     await deleteDoc(ref);
-    alert(failed?`حُذف المشروع، لكن تعذّر حذف ${failed} صورة من تلغرام (قد تكون أقدم من 48 ساعة).`:'تم حذف المشروع وصوره.');
   }catch(err){
-    console.error(err);alert('تعذّر الحذف: '+(err.code||err.message));
-    b.disabled=false;b.textContent=orig;
+    alert('تعذّر الحذف: '+(err.message));b.disabled=false;b.textContent='حذف';
   }
 });
 
-/* ---------- photo staging ---------- */
+/* ---------- photo staging & HEIC handling ---------- */
 let staged=[];
 const MAX_PHOTOS=30;
 
@@ -201,7 +194,6 @@ function renderStage(){
   });
   $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
 
-  // التحكم في ظهور زر التحويل
   const convBtn = $('convertBtn');
   if (staged.length) {
     convBtn.style.display = 'inline-block';
@@ -214,10 +206,46 @@ function renderStage(){
 }
 
 $('pickBtn').addEventListener('click',()=>$('photos').click());
-$('photos').addEventListener('change',e=>{
-  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
-  for(const f of files){if(staged.length>=MAX_PHOTOS)break;staged.push({file:f,url:URL.createObjectURL(f), isConverted: false})}
-  e.target.value='';
+
+$('photos').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  if (!files.length) return;
+
+  const pickBtn = $('pickBtn');
+  const countText = $('count');
+  const origText = pickBtn.textContent;
+  
+  pickBtn.disabled = true;
+  
+  for(let j = 0; j < files.length; j++){
+    if(staged.length >= MAX_PHOTOS) break;
+    let f = files[j];
+    
+    // التحقق مما إذا كانت الصورة من آيفون (HEIC) لمعالجتها قبل عرضها
+    const isHeic = f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif');
+    
+    if (isHeic) {
+        countText.textContent = `فك تشفير صور آيفون (${j+1}/${files.length})... ⏳`;
+        try {
+            // تحويل الصورة برمجياً لكي يقرأها المتصفح بدون ظهورها باللون الأسود
+            const convBlob = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.85 });
+            const blob = Array.isArray(convBlob) ? convBlob[0] : convBlob;
+            f = new File([blob], f.name.replace(/\.heic|\.heif/gi, ".jpg"), { type: "image/jpeg" });
+        } catch (err) {
+            console.error(err);
+            alert(`فشلت قراءة الصورة الخاصة بآيفون: ${f.name}\nيرجى التأكد أنها ليست تالفة.`);
+            continue; 
+        }
+    }
+    
+    if(f.type.startsWith('image/')) {
+        staged.push({file: f, url: URL.createObjectURL(f), isConverted: false});
+    }
+  }
+  
+  e.target.value = '';
+  pickBtn.disabled = false;
+  pickBtn.textContent = origText;
   renderStage();
 });
 
@@ -232,14 +260,9 @@ $('thumbs').addEventListener('click',e=>{
 
 function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
 
-/* ---------- compress (updated to prevent IMAGE_PROCESS_FAILED) ---------- */
+/* ---------- compress (Safe resize & Strict Error Handling) ---------- */
 function compress(file, max=1200, q=0.85) { 
-  return new Promise(res => {
-    if (!file.type.startsWith('image/') || file.type.includes('gif')) {
-        res(file);
-        return;
-    }
-
+  return new Promise((res, rej) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
     
@@ -248,6 +271,8 @@ function compress(file, max=1200, q=0.85) {
         let w = img.naturalWidth;
         let h = img.naturalHeight;
         
+        if (w === 0 || h === 0) throw new Error("أبعاد الصورة 0 (صورة تالفة)");
+
         if (w > max || h > max) {
             const sc = Math.min(max / w, max / h);
             w = Math.round(w * sc);
@@ -261,25 +286,21 @@ function compress(file, max=1200, q=0.85) {
         
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, w, h);
-        
         ctx.drawImage(img, 0, 0, w, h);
         
         c.toBlob(b => {
           URL.revokeObjectURL(url);
-          if(b && b.size > 0) {
-              res(b);
-          } else {
-              res(file);
-          }
+          if(b && b.size > 0) res(b);
+          else rej(new Error("فشل ضغط الصورة"));
         }, 'image/jpeg', q); 
       } catch(e) {
         URL.revokeObjectURL(url);
-        res(file);
+        rej(e);
       }
     };
     img.onerror = () => {
         URL.revokeObjectURL(url);
-        res(file);
+        rej(new Error("لا يمكن قراءة هذه الصورة. قد تكون تالفة."));
     };
     img.src = url;
   });
@@ -289,46 +310,58 @@ function compress(file, max=1200, q=0.85) {
 $('convertBtn').addEventListener('click', async () => {
   const btn = $('convertBtn');
   btn.disabled = true;
+  let hasError = false;
+
   for (let i = 0; i < staged.length; i++) {
-    if (staged[i].isConverted) continue; // تخطي إذا تم تحويلها مسبقاً
+    if (staged[i].isConverted) continue;
     
-    btn.textContent = `جاري التحويل... ${i + 1} / ${staged.length}`;
-    const blob = await compress(staged[i].file);
-    
-    // استبدال الصورة القديمة بالصورة المحولة
-    staged[i].file = new File([blob], `photo_${i}.jpg`, { type: 'image/jpeg' });
-    staged[i].isConverted = true;
-    
-    // تحديث مصغرات الصور
-    URL.revokeObjectURL(staged[i].url);
-    staged[i].url = URL.createObjectURL(staged[i].file);
+    btn.textContent = `جاري الضغط والتحويل... ${i + 1} / ${staged.length}`;
+    try {
+        const blob = await compress(staged[i].file);
+        staged[i].file = new File([blob], `photo_${i}.jpg`, { type: 'image/jpeg' });
+        staged[i].isConverted = true;
+        
+        URL.revokeObjectURL(staged[i].url);
+        staged[i].url = URL.createObjectURL(staged[i].file);
+    } catch (err) {
+        alert(`❌ فشل في الصورة رقم ${i + 1}: ${err.message}\nيرجى إزالتها بعلامة (✕).`);
+        hasError = true;
+    }
   }
-  renderStage(); // تحديث الواجهة
+  
+  if (hasError) {
+      btn.textContent = 'حدث خطأ في بعض الصور ⚠️';
+      btn.disabled = false;
+  } else {
+      btn.textContent = 'تم التحويل بنجاح ✅';
+  }
+  renderStage();
 });
 
-/* ---------- upload: obeys Telegram's "retry after" (HTTP 429) ---------- */
+/* ---------- upload ---------- */
 async function tgUploadPhoto(blob,index,total,onWait){
   for(let attempt=0;attempt<6;attempt++){
     const fd=new FormData();
     fd.append('chat_id',TG_CHAT);
     fd.append('photo',blob,`photo_${index}_of_${total}.jpg`);
-    let data;
     try{
       const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,{method:'POST',body:fd});
-      data=await res.json();
-    }catch(e){await sleep(2000);continue} // transient network error
-    if(data.ok){
-      const arr=data.result.photo;
-      return{file_id:arr[arr.length-1].file_id,message_id:data.result.message_id};
+      const data=await res.json();
+      if(data.ok){
+        const arr=data.result.photo;
+        return{file_id:arr[arr.length-1].file_id,message_id:data.result.message_id};
+      }
+      if(data.error_code===429){
+        const wait=((data.parameters&&data.parameters.retry_after)||5)+1;
+        if(onWait)onWait(wait);
+        await sleep(wait*1000);continue;
+      }
+      throw new Error(data.description||'فشل الرفع');
+    }catch(e){
+      if(attempt===5) throw e;
+      await sleep(2000);
     }
-    if(data.error_code===429){
-      const wait=((data.parameters&&data.parameters.retry_after)||5)+1;
-      if(onWait)onWait(wait);
-      await sleep(wait*1000);continue;
-    }
-    throw new Error(data.description||'فشل الرفع');
   }
-  throw new Error('فشل الرفع بعد عدة محاولات');
 }
 
 /* ---------- publish ---------- */
@@ -337,10 +370,16 @@ $('addProjectForm').addEventListener('submit',async e=>{
   const btn=$('addBtn'),msg=$('addMsg'),bar=$('bar'),barI=$('barI');
   msg.className='msg';msg.textContent='';
 
-  if(TG_TOKEN==='PUT_NEW_TOKEN_HERE'){msg.classList.add('err');msg.textContent='ضع توكن البوت في أعلى السكربت (TG_TOKEN).';return}
   if(!staged.length){msg.classList.add('err');msg.textContent='اختر صورة واحدة على الأقل.';return}
   const levels=parseInt($('levels').value,10);
-  if(!(levels>=1)){msg.classList.add('err');msg.textContent='أدخل عدد الطوابق.';return}
+  
+  // التأكد من أن جميع الصور محولة ومضغوطة
+  const unconvertableImages = staged.filter(s => !s.isConverted);
+  if (unconvertableImages.length > 0) {
+      msg.classList.add('err');
+      msg.textContent='يرجى الضغط على زر "تحويل الصور" أولاً، وحذف أي صورة تظهر بمربع أسود.';
+      return;
+  }
 
   btn.disabled=true;bar.style.display='block';barI.style.width='0';
   const fileIds=[],messageIds=[];let failedAt=-1;
@@ -350,10 +389,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
       failedAt=i;
       btn.textContent=`جاري إرسال الصورة ${i+1} من ${staged.length}...`;
       
-      // استخدام الصورة المحولة مباشرة، أو تحويلها إذا نسي المستخدم الضغط على الزر
-      const blob = staged[i].isConverted ? staged[i].file : await compress(staged[i].file);
-      
-      const tg=await tgUploadPhoto(blob,i+1,staged.length,s=>{
+      const tg=await tgUploadPhoto(staged[i].file, i+1, staged.length, s=>{
         btn.textContent=`تلغرام طلب الانتظار ${s} ثانية (الصورة ${i+1}/${staged.length})...`;
       });
       fileIds.push(tg.file_id);messageIds.push(tg.message_id);
@@ -365,17 +401,13 @@ $('addProjectForm').addEventListener('submit',async e=>{
     await addDoc(collection(db,'projects'),{
       t:{ar:$('t_ar').value.trim(),fr:$('t_fr').value.trim()},
       loc:{ar:$('loc_ar').value.trim(),fr:$('loc_fr').value.trim()},
-      levels,
-      photos:fileIds,
-      tg_message_ids:messageIds,
-      createdAt:serverTimestamp()
+      levels, photos:fileIds, tg_message_ids:messageIds, createdAt:serverTimestamp()
     });
     msg.classList.add('ok');msg.textContent='تم نشر المشروع بنجاح!';
     $('addProjectForm').reset();clearStage();
   }catch(err){
-    console.error(err);msg.classList.add('err');
-    const why=err.code==='permission-denied'?'قواعد Firestore ترفض الكتابة.':(err.message||'خطأ غير معروف');
-    msg.textContent=(failedAt>=0?`فشلت الصورة رقم ${failedAt+1}: `:'فشل الحفظ: ')+why;
+    msg.classList.add('err');
+    msg.textContent=(failedAt>=0?`فشلت الصورة رقم ${failedAt+1}: `:'فشل الحفظ: ')+err.message;
   }
   btn.disabled=false;btn.textContent='رفع ونشر المشروع';
   setTimeout(()=>{bar.style.display='none'},1200);
