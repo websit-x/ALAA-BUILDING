@@ -80,10 +80,11 @@ input:focus{border-color:var(--or)}
         <label>صور المشروع — بالترتيب الذي تظهر به في الموقع</label>
         <div class="pick">
           <button type="button" class="btn ghost" id="pickBtn">＋ اختيار صور</button>
+          <button type="button" class="btn ghost" id="convertBtn" style="border-color: #6be08a; color: #6be08a;">⟳ تحويل الكل لـ JPG</button>
           <span class="count" id="count">لم تُختَر صور بعد</span>
         </div>
         <input type="file" id="photos" multiple accept="image/*" hidden>
-        <div class="hint">اختر عدة صور معاً. يمكنك ترتيبها (▲/▼) أو حذفها (✕) قبل النشر.</div>
+        <div class="hint">يجب عليك الضغط على "تحويل الكل لـ JPG" قبل النشر لضمان توافق الصور مع تلغرام.</div>
         <div class="thumbs" id="thumbs"></div>
       </div>
 
@@ -185,20 +186,66 @@ $('projectsList').addEventListener('click',async e=>{
   }
 });
 
-/* ---------- compress (يُغيّر الصيغة والاسم فوراً عند الاختيار) ---------- */
-function compress(file, max = 1200, q = 0.85) {
+/* ---------- photo staging ---------- */
+let staged=[]; 
+const MAX_PHOTOS=30;
+let arePhotosConverted = false;
+
+function renderStage(){
+  const box=$('thumbs');box.innerHTML='';
+  staged.forEach((s,i)=>{
+    const t=document.createElement('div');t.className='th';
+    t.innerHTML='<img alt=""><span class="no"></span><div class="ctl"><button type="button" data-a="up">▲</button><button type="button" data-a="dn">▼</button><button type="button" data-a="rm" class="x">✕</button></div>';
+    t.querySelector('img').src=s.url;t.querySelector('.no').textContent=i+1;t.dataset.i=i;box.appendChild(t);
+  });
+  $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
+}
+
+$('pickBtn').addEventListener('click',()=>$('photos').click());
+
+$('photos').addEventListener('change', e=>{
+  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
+  for(const f of files){
+      if(staged.length>=MAX_PHOTOS) break;
+      staged.push({file:f, url:URL.createObjectURL(f)});
+  }
+  e.target.value=''; 
+  arePhotosConverted = false; // تصفير حالة التحويل عند إضافة صور جديدة
+  $('convertBtn').textContent = '⟳ تحويل الكل لـ JPG';
+  renderStage();
+});
+
+$('thumbs').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-a]');if(!b)return;
+  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
+  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
+  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
+  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
+  renderStage();
+});
+
+function clearStage(){
+    staged.forEach(s=>URL.revokeObjectURL(s.url));
+    staged=[];
+    arePhotosConverted = false;
+    $('convertBtn').textContent = '⟳ تحويل الكل لـ JPG';
+    renderStage();
+}
+
+/* ---------- Converter logic ---------- */
+function convertToJPG(file, q = 0.85) {
   return new Promise(res => {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       try {
-        const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-        const w = Math.round(img.naturalWidth * sc), h = Math.round(img.naturalHeight * sc);
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
         const c = document.createElement('canvas');
         c.width = w; c.height = h;
         const ctx = c.getContext('2d');
         
-        // خلفية بيضاء قسرية
+        // خلفية بيضاء لتفادي الشفافية السوداء عند التحويل
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
@@ -206,9 +253,8 @@ function compress(file, max = 1200, q = 0.85) {
         c.toBlob(b => {
           URL.revokeObjectURL(url);
           if (b) {
-            // تسمية عشوائية بصيغة JPG
-            const newName = `photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
-            res(new File([b], newName, { type: 'image/jpeg' }));
+            const jpgFile = new File([b], `converted_${Date.now()}_${Math.floor(Math.random()*100)}.jpg`, { type: 'image/jpeg' });
+            res(jpgFile);
           } else {
             res(file);
           }
@@ -226,65 +272,41 @@ function compress(file, max = 1200, q = 0.85) {
   });
 }
 
-/* ---------- photo staging ---------- */
-let staged=[];
-const MAX_PHOTOS=30;
-function renderStage(){
-  const box=$('thumbs');box.innerHTML='';
-  staged.forEach((s,i)=>{
-    const t=document.createElement('div');t.className='th';
-    t.innerHTML='<img alt=""><span class="no"></span><div class="ctl"><button type="button" data-a="up">▲</button><button type="button" data-a="dn">▼</button><button type="button" data-a="rm" class="x">✕</button></div>';
-    t.querySelector('img').src=s.url;t.querySelector('.no').textContent=i+1;t.dataset.i=i;box.appendChild(t);
-  });
-  $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
-}
+$('convertBtn').addEventListener('click', async () => {
+    if(!staged.length) {
+        alert('اختر صوراً أولاً للتحويل!');
+        return;
+    }
+    
+    const btn = $('convertBtn');
+    btn.disabled = true;
+    btn.textContent = 'جاري التحويل...';
 
-$('pickBtn').addEventListener('click',()=>$('photos').click());
-
-// هنا يتم التحويل والضغط فور اختيار الصور
-$('photos').addEventListener('change', async e=>{
-  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
-  if(!files.length) return;
-  
-  const btn = $('pickBtn');
-  btn.disabled = true;
-  btn.textContent = 'جاري التجهيز...';
-  
-  for(const f of files){
-    if(staged.length>=MAX_PHOTOS) break;
-    // التحويل إلى JPG في نفس اللحظة
-    const jpgFile = await compress(f);
-    staged.push({file: jpgFile, url: URL.createObjectURL(jpgFile)});
-  }
-  
-  e.target.value='';
-  btn.disabled = false;
-  btn.textContent = '＋ اختيار صور';
-  renderStage();
+    for(let i=0; i<staged.length; i++) {
+        // تحويل كل ملف للنوع الجديد
+        const newFile = await convertToJPG(staged[i].file);
+        URL.revokeObjectURL(staged[i].url); // تنظيف الرابط القديم
+        staged[i] = {file: newFile, url: URL.createObjectURL(newFile)};
+    }
+    
+    arePhotosConverted = true;
+    btn.textContent = '✓ تمت التهيئة لـ JPG';
+    btn.disabled = false;
+    renderStage();
 });
 
-$('thumbs').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-a]');if(!b)return;
-  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
-  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
-  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
-  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
-  renderStage();
-});
-function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
 
-/* ---------- upload: obeys Telegram's "retry after" (HTTP 429) ---------- */
-async function tgUploadPhoto(fileObj, onWait){
+/* ---------- upload ---------- */
+async function tgUploadPhoto(fileObj,index,total,onWait){
   for(let attempt=0;attempt<6;attempt++){
     const fd=new FormData();
     fd.append('chat_id',TG_CHAT);
-    // إرسال الملف باسمه الجديد (.jpg) الموجود داخله
     fd.append('photo',fileObj, fileObj.name);
     let data;
     try{
       const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,{method:'POST',body:fd});
       data=await res.json();
-    }catch(e){await sleep(2000);continue} // transient network error
+    }catch(e){await sleep(2000);continue}
     if(data.ok){
       const arr=data.result.photo;
       return{file_id:arr[arr.length-1].file_id,message_id:data.result.message_id};
@@ -296,7 +318,7 @@ async function tgUploadPhoto(fileObj, onWait){
     }
     throw new Error(data.description||'فشل الرفع');
   }
-  throw new Error('فشل الرفع بعد عدة محاولات');
+  throw new Error('فشل الرفع بعد المحاولات');
 }
 
 /* ---------- publish ---------- */
@@ -305,7 +327,16 @@ $('addProjectForm').addEventListener('submit',async e=>{
   const btn=$('addBtn'),msg=$('addMsg'),bar=$('bar'),barI=$('barI');
   msg.className='msg';msg.textContent='';
 
+  if(TG_TOKEN==='PUT_NEW_TOKEN_HERE'){msg.classList.add('err');msg.textContent='ضع توكن البوت في أعلى السكربت (TG_TOKEN).';return}
   if(!staged.length){msg.classList.add('err');msg.textContent='اختر صورة واحدة على الأقل.';return}
+  
+  // شرط التأكد من الضغط على زر التحويل
+  if(!arePhotosConverted){
+      msg.classList.add('err');
+      msg.textContent='الرجاء الضغط على زر "تحويل الكل لـ JPG" قبل الرفع لتجنب مشاكل تلغرام.';
+      return;
+  }
+
   const levels=parseInt($('levels').value,10);
   if(!(levels>=1)){msg.classList.add('err');msg.textContent='أدخل عدد الطوابق.';return}
 
@@ -317,14 +348,13 @@ $('addProjectForm').addEventListener('submit',async e=>{
       failedAt=i;
       btn.textContent=`جاري إرسال الصورة ${i+1} من ${staged.length}...`;
       
-      // نرسل الملف الجاهز مباشرة (مضغوط ومسمى مسبقاً)
-      const tg=await tgUploadPhoto(staged[i].file, s=>{
-        btn.textContent=`تلغرام طلب الانتظار ${s} ثانية (الصورة ${i+1}/${staged.length})...`;
+      const tg=await tgUploadPhoto(staged[i].file, i+1, staged.length, s=>{
+        btn.textContent=`تلغرام طلب الانتظار ${s} ثانية...`;
       });
       
       fileIds.push(tg.file_id);messageIds.push(tg.message_id);
       barI.style.width=((i+1)/staged.length*100)+'%';
-      if(i<staged.length-1)await sleep(3000);
+      if(i<staged.length-1)await sleep(3000); 
     }
     failedAt=-1;
     btn.textContent='جاري الحفظ في قاعدة البيانات...';
