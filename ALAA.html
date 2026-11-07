@@ -106,15 +106,15 @@ input:focus{border-color:var(--or)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // إعدادات Firebase الخاصة بمشروعك
 const firebaseConfig={apiKey:"AIzaSyCu-ZLIqFgvZSEm8KSn7Seh1X9lnHhGSh0",authDomain:"shop-clothes-224a3.firebaseapp.com",projectId:"shop-clothes-224a3"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 
-// إعدادات Telegram المخبأة هنا مباشرة
+// إعدادات Telegram
 const TG_TOKEN = "9242734114:AAGLI4dhUGnR4EgTm9aqN-7wjbNB6tYTl9k";
-const TG_CHAT = "7737717483";
+const TG_CHAT = "-1002340332851"; // Chat ID الخاص بالمجموعة الجديدة
 
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
@@ -163,11 +163,53 @@ function loadProjects(){
     });
   },err=>{console.error(err);$('projectsList').innerHTML='<p class="err" style="text-align:center">تعذّر تحميل المشاريع: '+(err.code||err.message)+'</p>'});
 }
+
+// دالة حذف المشروع والصور من تلغرام
 $('projectsList').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
-  if(!confirm('هل أنت متأكد من حذف هذا المشروع؟'))return;
-  try{await deleteDoc(doc(db,'projects',b.dataset.id))}
-  catch(err){console.error(err);alert('تعذّر الحذف: '+(err.code||err.message))}
+  if(!confirm('هل أنت متأكد من حذف هذا المشروع؟ سيتم حذف صوره من تلغرام أيضاً.'))return;
+  
+  const projectId = b.dataset.id;
+  const originalText = b.textContent;
+  b.disabled = true;
+  b.textContent = 'جاري الحذف...';
+
+  try {
+    // 1. جلب بيانات المشروع لمعرفة معرفات الرسائل في تلغرام
+    const docRef = doc(db, 'projects', projectId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      const projectData = docSnap.data();
+      const messageIds = projectData.tg_message_ids || []; // مصفوفة تحفظ أرقام الرسائل
+
+      // 2. حذف كل رسالة (صورة) من مجموعة تلغرام
+      for (const msgId of messageIds) {
+        try {
+          await fetch(`https://api.telegram.org/bot${TG_TOKEN}/deleteMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: TG_CHAT,
+              message_id: msgId
+            })
+          });
+        } catch(err) {
+          console.error(`Failed to delete message ${msgId} from Telegram:`, err);
+        }
+      }
+    }
+
+    // 3. حذف المشروع من قاعدة البيانات
+    await deleteDoc(docRef);
+    alert('تم حذف المشروع وصوره بنجاح.');
+
+  } catch(err){
+    console.error(err);
+    alert('تعذّر الحذف: '+(err.code||err.message));
+    b.disabled = false;
+    b.textContent = originalText;
+  }
 });
 
 /* ---------- photo staging: add, reorder, remove ---------- */
@@ -217,12 +259,22 @@ function compress(file,max=1600,q=.82){
   });
 }
 
-async function tgUpload(blob){
-  const fd=new FormData();fd.append('chat_id',TG_CHAT);fd.append('photo',blob,'photo.jpg');
-  const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,{method:'POST',body:fd});
-  let data;try{data=await res.json()}catch(e){throw new Error('رد غير مفهوم من تلغرام (HTTP '+res.status+')')}
+// تعديل الدالة لترسل الصور كملف (Document) وتُرجع الـ file_id ورقم الرسالة
+async function tgUploadDocument(blob, index, total){
+  const fd=new FormData();
+  fd.append('chat_id',TG_CHAT);
+  fd.append('document',blob,`photo_${index}_of_${total}.jpg`);
+  
+  const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`,{method:'POST',body:fd});
+  let data;
+  try{data=await res.json()}catch(e){throw new Error('رد غير مفهوم من تلغرام (HTTP '+res.status+')')}
+  
   if(!data.ok)throw new Error(data.description||'فشل الرفع إلى تلغرام');
-  const arr=data.result.photo;return arr[arr.length-1].file_id;
+  
+  return {
+    file_id: data.result.document.file_id,
+    message_id: data.result.message_id
+  };
 }
 
 /* ---------- publish ---------- */
@@ -236,26 +288,47 @@ $('addProjectForm').addEventListener('submit',async e=>{
   if(!(levels>=1)){msg.classList.add('err');msg.textContent='أدخل عدد الطوابق.';return}
 
   btn.disabled=true;bar.style.display='block';barI.style.width='0';
-  const ids=[];let failedAt=-1;
+  
+  const fileIds = [];
+  const messageIds = []; // لتخزين معرفات الرسائل في تلغرام لاستخدامها في الحذف لاحقاً
+  let failedAt = -1;
+  
   try{
     for(let i=0;i<staged.length;i++){
       failedAt=i;
-      btn.textContent=`جاري رفع الصورة ${i+1} من ${staged.length}...`;
+      btn.textContent=`جاري إرسال الصورة كملف ${i+1} من ${staged.length}...`;
       const blob=await compress(staged[i].file);
-      let id;
-      try{id=await tgUpload(blob)}
-      catch(err){ 
-        await new Promise(r=>setTimeout(r,1200));id=await tgUpload(blob);
+      let tgData;
+      
+      try{
+        tgData = await tgUploadDocument(blob, i+1, staged.length);
       }
-      ids.push(id);barI.style.width=((i+1)/staged.length*100)+'%';
+      catch(err){ 
+        // محاولة ثانية في حال فشل الإرسال
+        await new Promise(r=>setTimeout(r,1500));
+        tgData = await tgUploadDocument(blob, i+1, staged.length);
+      }
+      
+      fileIds.push(tgData.file_id);
+      messageIds.push(tgData.message_id);
+      
+      barI.style.width=((i+1)/staged.length*100)+'%';
+      
+      // تأخير بسيط بين رفع كل ملف لتجنب حظر تلغرام (Too Many Requests)
+      if(i < staged.length - 1) await new Promise(r => setTimeout(r, 800));
     }
+    
     failedAt=-1;
     btn.textContent='جاري الحفظ في قاعدة البيانات...';
     await addDoc(collection(db,'projects'),{
       t:{ar:$('t_ar').value.trim(),fr:$('t_fr').value.trim()},
       loc:{ar:$('loc_ar').value.trim(),fr:$('loc_fr').value.trim()},
-      levels,photos:ids,createdAt:serverTimestamp()
+      levels,
+      photos: fileIds, 
+      tg_message_ids: messageIds, // حفظ الـ IDs لاستخدامها في عملية الحذف
+      createdAt: serverTimestamp()
     });
+    
     msg.classList.add('ok');msg.textContent='تم نشر المشروع بنجاح!';
     $('addProjectForm').reset();clearStage();
   }catch(err){
@@ -263,6 +336,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
     const code=err.code==='permission-denied'?'قواعد Firestore ترفض الكتابة (تأكد أنها تسمح لـ request.auth != null).':(err.message||'خطأ غير معروف');
     msg.textContent=(failedAt>=0?`فشلت الصورة رقم ${failedAt+1}: `:'فشل الحفظ: ')+code;
   }
+  
   btn.disabled=false;btn.textContent='رفع ونشر المشروع';
   setTimeout(()=>{bar.style.display='none'},1200);
 });
