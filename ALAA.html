@@ -80,11 +80,10 @@ input:focus{border-color:var(--or)}
         <label>صور المشروع — بالترتيب الذي تظهر به في الموقع</label>
         <div class="pick">
           <button type="button" class="btn ghost" id="pickBtn">＋ اختيار صور</button>
-          <button type="button" class="btn ghost" id="convertBtn" style="display:none; color:#6be08a; border-color:#6be08a;">⚙️ تحويل الصور لتلغرام</button>
           <span class="count" id="count">لم تُختَر صور بعد</span>
         </div>
         <input type="file" id="photos" multiple accept="image/*,.heic,.heif" hidden>
-        <div class="hint">اختر عدة صور معاً. يمكنك ترتيبها (▲/▼) أو حذفها (✕) قبل النشر. (صور الآيفون مدعومة).</div>
+        <div class="hint">اختر الصور (تعمل مع الآيفون تلقائياً). سيتم فك تشفيرها وتجهيزها تلقائياً.</div>
         <div class="thumbs" id="thumbs"></div>
       </div>
 
@@ -181,7 +180,7 @@ $('projectsList').addEventListener('click',async e=>{
   }
 });
 
-/* ---------- photo staging & HEIC handling ---------- */
+/* ---------- photo staging ---------- */
 let staged=[];
 const MAX_PHOTOS=30;
 
@@ -193,77 +192,12 @@ function renderStage(){
     t.querySelector('img').src=s.url;t.querySelector('.no').textContent=i+1;t.dataset.i=i;box.appendChild(t);
   });
   $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
-
-  const convBtn = $('convertBtn');
-  if (staged.length) {
-    convBtn.style.display = 'inline-block';
-    const allConverted = staged.every(s => s.isConverted);
-    convBtn.textContent = allConverted ? 'تم التحويل بنجاح ✅' : '⚙️ تحويل الصور لتلغرام';
-    convBtn.disabled = allConverted;
-  } else {
-    convBtn.style.display = 'none';
-  }
 }
 
-$('pickBtn').addEventListener('click',()=>$('photos').click());
-
-$('photos').addEventListener('change', async e => {
-  const files = [...e.target.files];
-  if (!files.length) return;
-
-  const pickBtn = $('pickBtn');
-  const countText = $('count');
-  const origText = pickBtn.textContent;
-  
-  pickBtn.disabled = true;
-  
-  for(let j = 0; j < files.length; j++){
-    if(staged.length >= MAX_PHOTOS) break;
-    let f = files[j];
-    
-    // التحقق مما إذا كانت الصورة من آيفون (HEIC) لمعالجتها قبل عرضها
-    const isHeic = f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif');
-    
-    if (isHeic) {
-        countText.textContent = `فك تشفير صور آيفون (${j+1}/${files.length})... ⏳`;
-        try {
-            // تحويل الصورة برمجياً لكي يقرأها المتصفح بدون ظهورها باللون الأسود
-            const convBlob = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.85 });
-            const blob = Array.isArray(convBlob) ? convBlob[0] : convBlob;
-            f = new File([blob], f.name.replace(/\.heic|\.heif/gi, ".jpg"), { type: "image/jpeg" });
-        } catch (err) {
-            console.error(err);
-            alert(`فشلت قراءة الصورة الخاصة بآيفون: ${f.name}\nيرجى التأكد أنها ليست تالفة.`);
-            continue; 
-        }
-    }
-    
-    if(f.type.startsWith('image/')) {
-        staged.push({file: f, url: URL.createObjectURL(f), isConverted: false});
-    }
-  }
-  
-  e.target.value = '';
-  pickBtn.disabled = false;
-  pickBtn.textContent = origText;
-  renderStage();
-});
-
-$('thumbs').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-a]');if(!b)return;
-  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
-  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
-  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
-  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
-  renderStage();
-});
-
-function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
-
 /* ---------- compress (Safe resize & Strict Error Handling) ---------- */
-function compress(file, max=1200, q=0.85) { 
+function compress(fileOrBlob, max=1200, q=0.85) { 
   return new Promise((res, rej) => {
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(fileOrBlob);
     const img = new Image();
     
     img.onload = () => {
@@ -291,7 +225,7 @@ function compress(file, max=1200, q=0.85) {
         c.toBlob(b => {
           URL.revokeObjectURL(url);
           if(b && b.size > 0) res(b);
-          else rej(new Error("فشل ضغط الصورة"));
+          else rej(new Error("فشل معالجة الصورة"));
         }, 'image/jpeg', q); 
       } catch(e) {
         URL.revokeObjectURL(url);
@@ -300,43 +234,72 @@ function compress(file, max=1200, q=0.85) {
     };
     img.onerror = () => {
         URL.revokeObjectURL(url);
-        rej(new Error("لا يمكن قراءة هذه الصورة. قد تكون تالفة."));
+        rej(new Error("صورة غير مدعومة أو تالفة"));
     };
     img.src = url;
   });
 }
 
-/* ---------- Convert Button Event Listener ---------- */
-$('convertBtn').addEventListener('click', async () => {
-  const btn = $('convertBtn');
-  btn.disabled = true;
-  let hasError = false;
+$('pickBtn').addEventListener('click',()=>$('photos').click());
 
-  for (let i = 0; i < staged.length; i++) {
-    if (staged[i].isConverted) continue;
+// المعالجة التلقائية وفك التشفير بمجرد اختيار الصور
+$('photos').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  if (!files.length) return;
+
+  const pickBtn = $('pickBtn');
+  const countText = $('count');
+  const origText = pickBtn.textContent;
+  
+  pickBtn.disabled = true;
+  
+  for(let j = 0; j < files.length; j++){
+    if(staged.length >= MAX_PHOTOS) break;
+    let f = files[j];
     
-    btn.textContent = `جاري الضغط والتحويل... ${i + 1} / ${staged.length}`;
+    // إظهار نص التحميل للمستخدم أثناء معالجة الصور
+    countText.textContent = `فك تشفير ومعالجة (${j+1}/${files.length})... ⏳`;
+    
     try {
-        const blob = await compress(staged[i].file);
-        staged[i].file = new File([blob], `photo_${i}.jpg`, { type: 'image/jpeg' });
-        staged[i].isConverted = true;
+        const isHeic = f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif');
+        let blobToCompress = f;
+
+        // 1. فك تشفير صور الآيفون
+        if (isHeic) {
+            const convBlob = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.85 });
+            blobToCompress = Array.isArray(convBlob) ? convBlob[0] : convBlob;
+        }
         
-        URL.revokeObjectURL(staged[i].url);
-        staged[i].url = URL.createObjectURL(staged[i].file);
+        // 2. ضغط وتحويل الصورة لتلغرام
+        const finalBlob = await compress(blobToCompress);
+        
+        // 3. تجهيز الملف النهائي للإرسال
+        const finalName = f.name.replace(/\.(heic|heif|png|webp|jpeg)$/i, "") + ".jpg";
+        const finalFile = new File([finalBlob], finalName, { type: "image/jpeg" });
+
+        staged.push({file: finalFile, url: URL.createObjectURL(finalFile)});
     } catch (err) {
-        alert(`❌ فشل في الصورة رقم ${i + 1}: ${err.message}\nيرجى إزالتها بعلامة (✕).`);
-        hasError = true;
+        console.error(err);
+        alert(`❌ فشلت معالجة الصورة: ${f.name}\nالسبب: ${err.message}`);
     }
   }
   
-  if (hasError) {
-      btn.textContent = 'حدث خطأ في بعض الصور ⚠️';
-      btn.disabled = false;
-  } else {
-      btn.textContent = 'تم التحويل بنجاح ✅';
-  }
+  e.target.value = '';
+  pickBtn.disabled = false;
+  pickBtn.textContent = origText;
   renderStage();
 });
+
+$('thumbs').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-a]');if(!b)return;
+  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
+  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
+  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
+  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
+  renderStage();
+});
+
+function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
 
 /* ---------- upload ---------- */
 async function tgUploadPhoto(blob,index,total,onWait){
@@ -372,14 +335,6 @@ $('addProjectForm').addEventListener('submit',async e=>{
 
   if(!staged.length){msg.classList.add('err');msg.textContent='اختر صورة واحدة على الأقل.';return}
   const levels=parseInt($('levels').value,10);
-  
-  // التأكد من أن جميع الصور محولة ومضغوطة
-  const unconvertableImages = staged.filter(s => !s.isConverted);
-  if (unconvertableImages.length > 0) {
-      msg.classList.add('err');
-      msg.textContent='يرجى الضغط على زر "تحويل الصور" أولاً، وحذف أي صورة تظهر بمربع أسود.';
-      return;
-  }
 
   btn.disabled=true;bar.style.display='block';barI.style.width='0';
   const fileIds=[],messageIds=[];let failedAt=-1;
@@ -389,6 +344,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
       failedAt=i;
       btn.textContent=`جاري إرسال الصورة ${i+1} من ${staged.length}...`;
       
+      // رفع الصورة المجهزة مباشرة (لأنها تفككت وتحولت مسبقاً)
       const tg=await tgUploadPhoto(staged[i].file, i+1, staged.length, s=>{
         btn.textContent=`تلغرام طلب الانتظار ${s} ثانية (الصورة ${i+1}/${staged.length})...`;
       });
