@@ -121,9 +121,7 @@ const AUTH_ERR={
   'auth/user-not-found':'هذا الحساب غير موجود.',
   'auth/invalid-email':'صيغة البريد غير صحيحة.',
   'auth/too-many-requests':'محاولات كثيرة، انتظر قليلاً.',
-  'auth/network-request-failed':'لا يوجد اتصال بالإنترنت.',
-  'auth/operation-not-allowed':'تسجيل الدخول بالبريد غير مفعّل في Firebase.',
-  'auth/operation-not-supported-in-this-environment':'افتح الصفحة من رابط https (وليس من ملف على الهاتف).'
+  'auth/network-request-failed':'لا يوجد اتصال بالإنترنت.'
 };
 let unsub=null;
 onAuthStateChanged(auth,user=>{
@@ -161,7 +159,7 @@ function loadProjects(){
   },err=>{console.error(err);$('projectsList').innerHTML='<p class="err" style="text-align:center">تعذّر تحميل المشاريع: '+(err.code||err.message)+'</p>'});
 }
 
-/* ---------- delete (project + telegram messages, result verified) ---------- */
+/* ---------- delete ---------- */
 $('projectsList').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-id]');if(!b)return;
   if(!confirm('هل أنت متأكد من حذف هذا المشروع؟ ستُحذف صوره من تلغرام أيضاً.'))return;
@@ -187,36 +185,7 @@ $('projectsList').addEventListener('click',async e=>{
   }
 });
 
-/* ---------- photo staging ---------- */
-let staged=[];
-const MAX_PHOTOS=30;
-function renderStage(){
-  const box=$('thumbs');box.innerHTML='';
-  staged.forEach((s,i)=>{
-    const t=document.createElement('div');t.className='th';
-    t.innerHTML='<img alt=""><span class="no"></span><div class="ctl"><button type="button" data-a="up">▲</button><button type="button" data-a="dn">▼</button><button type="button" data-a="rm" class="x">✕</button></div>';
-    t.querySelector('img').src=s.url;t.querySelector('.no').textContent=i+1;t.dataset.i=i;box.appendChild(t);
-  });
-  $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
-}
-$('pickBtn').addEventListener('click',()=>$('photos').click());
-$('photos').addEventListener('change',e=>{
-  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
-  for(const f of files){if(staged.length>=MAX_PHOTOS)break;staged.push({file:f,url:URL.createObjectURL(f)})}
-  e.target.value='';
-  renderStage();
-});
-$('thumbs').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-a]');if(!b)return;
-  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
-  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
-  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
-  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
-  renderStage();
-});
-function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
-
-/* ---------- compress (يُجبر كل صورة على أن تكون JPG مع خلفية بيضاء) ---------- */
+/* ---------- compress (يُغيّر الصيغة والاسم فوراً عند الاختيار) ---------- */
 function compress(file, max = 1200, q = 0.85) {
   return new Promise(res => {
     const url = URL.createObjectURL(file);
@@ -228,7 +197,8 @@ function compress(file, max = 1200, q = 0.85) {
         const c = document.createElement('canvas');
         c.width = w; c.height = h;
         const ctx = c.getContext('2d');
-        // ملء الخلفية باللون الأبيض لمنع أخطاء تلغرام مع صور PNG
+        
+        // خلفية بيضاء قسرية
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
@@ -236,9 +206,9 @@ function compress(file, max = 1200, q = 0.85) {
         c.toBlob(b => {
           URL.revokeObjectURL(url);
           if (b) {
-            // إعادة التسمية وتحديد الصيغة كـ JPG حصراً
-            const jpgFile = new File([b], `img_${Date.now()}.jpg`, { type: 'image/jpeg' });
-            res(jpgFile);
+            // تسمية عشوائية بصيغة JPG
+            const newName = `photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
+            res(new File([b], newName, { type: 'image/jpeg' }));
           } else {
             res(file);
           }
@@ -256,13 +226,60 @@ function compress(file, max = 1200, q = 0.85) {
   });
 }
 
+/* ---------- photo staging ---------- */
+let staged=[];
+const MAX_PHOTOS=30;
+function renderStage(){
+  const box=$('thumbs');box.innerHTML='';
+  staged.forEach((s,i)=>{
+    const t=document.createElement('div');t.className='th';
+    t.innerHTML='<img alt=""><span class="no"></span><div class="ctl"><button type="button" data-a="up">▲</button><button type="button" data-a="dn">▼</button><button type="button" data-a="rm" class="x">✕</button></div>';
+    t.querySelector('img').src=s.url;t.querySelector('.no').textContent=i+1;t.dataset.i=i;box.appendChild(t);
+  });
+  $('count').textContent=staged.length?`${staged.length} صورة جاهزة`:'لم تُختَر صور بعد';
+}
+
+$('pickBtn').addEventListener('click',()=>$('photos').click());
+
+// هنا يتم التحويل والضغط فور اختيار الصور
+$('photos').addEventListener('change', async e=>{
+  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
+  if(!files.length) return;
+  
+  const btn = $('pickBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري التجهيز...';
+  
+  for(const f of files){
+    if(staged.length>=MAX_PHOTOS) break;
+    // التحويل إلى JPG في نفس اللحظة
+    const jpgFile = await compress(f);
+    staged.push({file: jpgFile, url: URL.createObjectURL(jpgFile)});
+  }
+  
+  e.target.value='';
+  btn.disabled = false;
+  btn.textContent = '＋ اختيار صور';
+  renderStage();
+});
+
+$('thumbs').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-a]');if(!b)return;
+  const i=+b.closest('.th').dataset.i,a=b.dataset.a;
+  if(a==='rm'){URL.revokeObjectURL(staged[i].url);staged.splice(i,1)}
+  if(a==='up'&&i>0)[staged[i-1],staged[i]]=[staged[i],staged[i-1]];
+  if(a==='dn'&&i<staged.length-1)[staged[i+1],staged[i]]=[staged[i],staged[i+1]];
+  renderStage();
+});
+function clearStage(){staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];renderStage()}
+
 /* ---------- upload: obeys Telegram's "retry after" (HTTP 429) ---------- */
-async function tgUploadPhoto(blob,index,total,onWait){
+async function tgUploadPhoto(fileObj, onWait){
   for(let attempt=0;attempt<6;attempt++){
     const fd=new FormData();
     fd.append('chat_id',TG_CHAT);
-    // إجبار تلغرام على رؤية الملف بصيغة jpg
-    fd.append('photo',blob,`photo_${index}_of_${total}.jpg`);
+    // إرسال الملف باسمه الجديد (.jpg) الموجود داخله
+    fd.append('photo',fileObj, fileObj.name);
     let data;
     try{
       const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,{method:'POST',body:fd});
@@ -299,13 +316,15 @@ $('addProjectForm').addEventListener('submit',async e=>{
     for(let i=0;i<staged.length;i++){
       failedAt=i;
       btn.textContent=`جاري إرسال الصورة ${i+1} من ${staged.length}...`;
-      const blob=await compress(staged[i].file);
-      const tg=await tgUploadPhoto(blob,i+1,staged.length,s=>{
+      
+      // نرسل الملف الجاهز مباشرة (مضغوط ومسمى مسبقاً)
+      const tg=await tgUploadPhoto(staged[i].file, s=>{
         btn.textContent=`تلغرام طلب الانتظار ${s} ثانية (الصورة ${i+1}/${staged.length})...`;
       });
+      
       fileIds.push(tg.file_id);messageIds.push(tg.message_id);
       barI.style.width=((i+1)/staged.length*100)+'%';
-      if(i<staged.length-1)await sleep(3000); // 3 ثواني تأخير
+      if(i<staged.length-1)await sleep(3000);
     }
     failedAt=-1;
     btn.textContent='جاري الحفظ في قاعدة البيانات...';
