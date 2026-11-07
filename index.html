@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0e10">
 <title>ALAA BUILDING</title>
-<meta name="description" content="مقاول هياكل الخرسانة المسلحة: تسليح، قولبة وصب — من الأساسات إلى آخر بلاطة.">
+<meta name="description" content="مؤسسة علاء لأشغال البناء في مختلف مراحله E.T.B T.C.E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111'/%3E%3Cpath d='M14 50V30h10v20zM27 50V18h10v32zM40 50V24h10v26z' fill='%23ff7a1a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,13 +31,11 @@ html[lang=ar] *{letter-spacing:0!important}
 #intro{position:fixed;inset:0;z-index:999;background:#0a0b0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .7s,visibility .7s;cursor:pointer;padding:20px}
 #intro.out{opacity:0;visibility:hidden}
 .intro-wrap{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:nowrap;direction:ltr}
-.intro-logo{width:clamp(64px,18vw,120px);height:clamp(64px,18vw,120px);border-radius:50%;object-fit:cover;border:2px solid var(--or);box-shadow:0 10px 25px rgba(0,0,0,.6);flex:none;background:#111}
-#intro .iv{width:min(56vw,420px);aspect-ratio:16/10;border-radius:16px;overflow:hidden;border:1px solid var(--line);flex:none}
+.intro-logo{width:clamp(80px,25vw,160px);height:clamp(80px,25vw,160px);border-radius:50%;object-fit:cover;border:2px solid var(--or);box-shadow:0 10px 25px rgba(0,0,0,.6);flex:none;background:#111}
 #intro h1{font:900 clamp(1.5rem,5vw,2.4rem)/1.2 'Cairo';text-align:center}
 #intro .ld{width:120px;height:2px;background:rgba(255,255,255,.1);overflow:hidden;border-radius:2px}
-#intro .ld i{display:block;height:100%;width:0;background:var(--or);animation:ldw 5s linear forwards}
+#intro .ld i{display:block;height:100%;width:0;background:var(--or);animation:ldw 3s linear forwards}
 @keyframes ldw{to{width:100%}}
-svg{display:block;width:100%;height:100%}
 
 /* nav */
 .bar{position:fixed;top:14px;left:0;right:0;margin-inline:auto;width:min(1120px,calc(100% - 28px));z-index:60;display:flex;align-items:center;gap:14px;padding:9px 12px 9px 24px;padding-inline:24px 12px;border-radius:999px;background:rgba(18,18,20,.66);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line)}
@@ -54,7 +52,7 @@ svg{display:block;width:100%;height:100%}
 .sec{max-width:1120px;margin:0 auto;padding:110px 20px 20px}
 .rv{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s;transition-delay:calc(var(--i,0)*.08s)}
 .rv.in{opacity:1;transform:none}
-.eyebrow{font:600 .78rem 'Barlow Condensed','Cairo';color:var(--or);letter-spacing:.22em;text-transform:uppercase;margin-bottom:12px}
+.eyebrow{font:600 .78rem 'Barlow Condensed','Cairo';color:var(--or);letter-spacing:.15em;margin-bottom:12px;display:block;}
 .display{font:900 clamp(2.2rem,5.2vw,4.6rem)/1.12 'Cairo';letter-spacing:-.01em}
 .display span{display:block}
 .display.sm{font-size:clamp(1.8rem,3.8vw,3rem)}
@@ -72,11 +70,8 @@ svg{display:block;width:100%;height:100%}
 .hero{min-height:100svh;display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding-top:110px;padding-bottom:60px}
 .hero .lead{margin:18px 0 18px}
 .note{display:inline-flex;gap:8px;align-items:center;color:#d8d8dc;font-size:.85rem;border:1px dashed rgba(255,122,26,.5);background:rgba(255,122,26,.07);padding:6px 14px;border-radius:10px;margin-bottom:24px}
-.hv{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#16181c;box-shadow:0 40px 80px rgba(0,0,0,.55)}
-.hv .fr{aspect-ratio:16/10}
-.hv .cp{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--line);font-size:.85rem;color:#cfcfd4}
-.hv .cp b{color:var(--or);font-family:'Barlow Condensed';font-size:1rem}
-.bar2{height:3px;background:rgba(255,255,255,.08)}.bar2 i{display:block;height:100%;background:var(--or);width:0;transition:width .6s}
+.hv{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#16181c;box-shadow:0 40px 80px rgba(0,0,0,.55); position: relative;}
+.hv video { display: block; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16/10; }
 
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:10px}
 .st{border:1px solid var(--line);border-radius:18px;background:var(--p1);padding:18px 22px}
@@ -178,7 +173,6 @@ footer a:hover{color:#fff}
 
 <div id="intro" aria-hidden="true">
   <div class="intro-wrap">
-    <div class="iv" id="introSvg"></div>
     <img src="youcef.png" alt="Logo" class="intro-logo" onerror="this.style.display='none'">
   </div>
   <h1 data-i18n="intro"></h1>
@@ -202,14 +196,19 @@ footer a:hover{color:#fff}
 <main>
 <section id="home" class="sec hero">
   <div>
-    <div class="eyebrow rv" data-i18n="eyebrow"></div>
+    <span class="eyebrow rv" data-i18n="eyebrow"></span>
     <h2 class="display rv" style="--i:1"><span data-i18n="h1a"></span><span class="o" data-i18n="h1b"></span></h2>
     <p class="lead rv" style="--i:2" data-i18n="lead"></p>
     <div class="note rv" style="--i:3">▣ <span data-i18n="scope"></span></div>
     <div class="cta rv" style="--i:4"><a class="btn pri" href="#projects" data-i18n="ctaProj"></a><a class="btn" href="#contact" data-i18n="ctaQuote"></a></div>
   </div>
   <div class="rv" style="--i:2">
-    <div class="hv"><div class="fr" id="heroSvg"></div><div class="bar2"><i id="heroBar"></i></div><div class="cp"><span id="heroLbl"></span><b id="heroNo"></b></div></div>
+    <!-- تم إزالة الرسم واستبداله بالفيديو هنا -->
+    <div class="hv">
+      <video autoplay loop muted playsinline>
+        <source src="video_14959146249537651817_y.mp4" type="video/mp4">
+      </video>
+    </div>
   </div>
 </section>
 
@@ -338,30 +337,28 @@ let PROJECTS=[];
 
 /* ---------- i18n ---------- */
 const I={
-ar:{intro:"من الحديد إلى الهيكل",nHome:"الرئيسية",nServices:"خدماتنا",nProjects:"أعمالنا",nContact:"تواصل",
- eyebrow:"خرسانة مسلحة · هياكل كاملة",h1a:"من الحديد",h1b:"إلى الهيكل",
- lead:"ننجز الهياكل الخرسانية كاملة: من تسليح الأساسات إلى صب آخر بلاطة، بدقة والتزام بمخططات المهندس.",
+ar:{intro:"مؤسسة علاء لأشغال البناء",nHome:"الرئيسية",nServices:"خدماتنا",nProjects:"أعمالنا",nContact:"تواصل",
+ eyebrow:"مؤسسة علاء لأشغال البناء في مختلف مراحله E.T.B  T.C.E",h1a:"من الحديد",h1b:"إلى الهيكل",
+ lead:"بناء مختلف البنايات للاستعمال المهني ، الإجتماعي أو الترفيهي",
  scope:"نسلّم الهيكل الخرساني فقط",ctaProj:"شاهد مشاريعنا",ctaQuote:"اطلب عرض سعر",
  st1:"مشروع منجز",st3:"سنوات خبرة",
  svT:"عملنا",
  svText:"نتميز في <b style='color:var(--or)'>ALAA BUILDING</b> بالاحترافية العالية في تنفيذ كافة أعمال الخرسانة المسلحة والهياكل الإنشائية للمباني السكنية والتجارية، بدءاً من أعمال الحفر والتأسيس وحتى صب الأسقف والأعمدة، مع الالتزام التام بالمخططات الهندسية واشتراطات الكود الهندسي المعتمد.<br><br><b style='color:var(--or);'>نقاط قوتنا في تنفيذ الخرسانات:</b><ul style='margin-top:12px;margin-inline-start:24px;display:flex;flex-direction:column;gap:8px;text-align:start;'><li><b>الدقة الشديدة في التسليح:</b> استخدام أفضل الطرق والالتزام بالمسافات والأقطار المحددة في المخطط الإنشائي دون أي تهاون.</li><li><b>الشدات الخشبية والعدّة:</b> استخدام شدات خشبية ومعدنية عالية الجودة لضمان استقامة وحداثة الأسطح الخرسانية.</li><li><b>ضبط جودة الخرسانة:</b> الإشراف المباشر على عمليات الصب، الاهتزازي (Vibration)، والمعالجة المائية (Curing) لضمان الوصول للمقاومة المطلوبة.</li></ul>",
  pjT:"مشاريعنا",pjS:"تصفح صور مشاريعنا الحقيقية من أرض الواقع، وشاركنا تقييمك.",
  open:"شاهد الصور ←",floors:"طوابق",photoLbl:"صورة",
- sLand:"تهيئة الأرض والتخطيط",sRF:"تسليح الأساسات",sCF:"صب الأساسات",sRC:"تسليح الأعمدة والبلاطة",sCC:"صب الأعمدة والبلاطة",gf:"الطابق الأرضي",fl:"الطابق",
  rate:"قيّم هذا المشروع",phName:"اسمك",phCom:"تعليقك (اختياري)",phMsg:"رسالتك",post:"نشر التقييم",reviews:"التعليقات",noRev:"لا توجد تعليقات بعد — كن الأول.",noRate:"لا تقييمات بعد",
  pick:"اختر عدد النجوم.",needName:"اكتب اسمك.",thanks:"شكراً، تم نشر تقييمك.",already:"لقد قيّمت هذا المشروع من قبل.",fail:"تعذّر الإرسال، حاول لاحقاً.",
  cLead:"لنتحدث عن مشروعك",cSub:"أرسل لنا تفاصيل المشروع ونعاودك بعرض سعر.",cTitle:"راسلنا",cHint:"تفتح رسالتك في واتساب جاهزة للإرسال.",send:"أرسل عبر واتساب",
  direct:"تواصل مباشر",directS:"نرد في أقرب وقت.",call:"اتصال هاتفي",where:"الموقع",wa:"مرحباً، أنا",foot:"هيكل متين. عمل نظيف.",top:"العودة للأعلى ↑"},
-fr:{intro:"Du fer à la structure",nHome:"Accueil",nServices:"Notre Travail",nProjects:"Réalisations",nContact:"Contact",
- eyebrow:"BÉTON ARMÉ · STRUCTURES COMPLÈTES",h1a:"Du ferraillage",h1b:"à la structure",
- lead:"Nous réalisons des structures en béton armé complètes : du ferraillage des fondations au coulage de la dernière dalle, selon les plans de l'ingénieur.",
+fr:{intro:"ALAA BUILDING",nHome:"Accueil",nServices:"Notre Travail",nProjects:"Réalisations",nContact:"Contact",
+ eyebrow:"ENTREPRISE ALAA DE TRAVAUX BÂTIMENT TOUS CORPS D'ÉTAT E.T.B T.C.E",h1a:"Du ferraillage",h1b:"à la structure",
+ lead:"Construction de divers bâtiments à usage professionnel, social ou récréatif.",
  scope:"Structure béton uniquement",ctaProj:"Voir nos réalisations",ctaQuote:"Demander un devis",
  st1:"PROJETS RÉALISÉS",st3:"ANS D'EXPÉRIENCE",
  svT:"Notre Travail",
  svText:"Chez <b style='color:var(--or)'>ALAA BUILDING</b>, nous nous distinguons par notre grand professionnalisme dans l'exécution de tous les travaux de béton armé et de structures pour les bâtiments résidentiels et commerciaux, des fouilles et fondations jusqu'au coulage des dalles et poteaux, dans le strict respect des plans et des normes d'ingénierie.<br><br><b style='color:var(--or);'>Nos points forts :</b><ul style='margin-top:12px;margin-inline-start:24px;display:flex;flex-direction:column;gap:8px;text-align:start;'><li><b>Ferraillage de haute précision :</b> Utilisation des meilleures méthodes et respect strict des espacements et diamètres définis dans les plans d'exécution.</li><li><b>Coffrage et étaiement :</b> Utilisation de coffrages en bois et métalliques de haute qualité pour garantir l'aplomb et la finition des surfaces.</li><li><b>Contrôle qualité du béton :</b> Supervision directe du coulage, de la vibration et de la cure pour garantir la résistance requise.</li></ul>",
  pjT:"Nos réalisations",pjS:"Parcourez les vraies photos de nos chantiers et laissez votre avis.",
  open:"Voir les photos →",floors:"niveaux",photoLbl:"Photo",
- sLand:"Terrain et implantation",sRF:"Ferraillage des fondations",sCF:"Coulage des fondations",sRC:"Ferraillage poteaux et dalle",sCC:"Coulage poteaux et dalle",gf:"RDC",fl:"Étage",
  rate:"Notez ce projet",phName:"Votre nom",phCom:"Votre commentaire (facultatif)",phMsg:"Votre message",post:"Publier",reviews:"Commentaires",noRev:"Aucun commentaire — soyez le premier.",noRate:"Pas encore de note",
  pick:"Choisissez le nombre d'étoiles.",needName:"Saisissez votre nom.",thanks:"Merci, votre avis est publié.",already:"Vous avez déjà noté ce projet.",fail:"Échec de l'envoi, réessayez.",
  cLead:"Parlons de votre projet",cSub:"Envoyez-nous les détails, nous revenons avec un devis.",cTitle:"Écrivez-nous",cHint:"Votre message s'ouvre dans WhatsApp, prêt à envoyer.",send:"Envoyer via WhatsApp",
@@ -370,50 +367,6 @@ fr:{intro:"Du fer à la structure",nHome:"Accueil",nServices:"Notre Travail",nPr
 let lang='ar';
 const D=()=>I[lang];
 
-/* ---------- construction illustration (intro + hero only) ---------- */
-function drawStage(s){
-  const L=4,GY=400,pitch=Math.min(76,Math.floor(320/L)),colH=pitch-12,xs=[0,1,2,3].map(i=>Math.round(200+i*400/3));
-  const R='#d2602c',o=[];
-  o.push('<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img">');
-  o.push('<defs>');
-  o.push('<linearGradient id="conc" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#e0e0e0"/><stop offset="50%" stop-color="#9a9a95"/><stop offset="100%" stop-color="#555550"/></linearGradient>');
-  o.push('<filter id="shd" x="-20%" y="-20%" width="150%" height="150%"><feDropShadow dx="5" dy="8" stdDeviation="5" flood-color="#000" flood-opacity="0.7"/></filter>');
-  o.push('</defs>');
-  const C='url(#conc)';
-  o.push('<rect width="800" height="500" fill="#16181c"/><rect y="330" width="800" height="70" fill="#1d1f23"/>');
-  o.push('<g fill="#3b3f46"><rect x="696" y="60" width="8" height="340"/><rect x="540" y="60" width="230" height="6"/><rect x="748" y="66" width="22" height="18" fill="#555a62"/></g><line x1="580" y1="66" x2="580" y2="140" stroke="#6b7078"/><rect x="574" y="140" width="12" height="8" fill="#ff7a1a"/>');
-  o.push('<rect y="400" width="800" height="100" fill="#2a231e"/><rect y="400" width="800" height="3" fill="#4a3c31"/>');
-  if(s===0){
-    xs.forEach(x=>o.push(`<rect x="${x-2}" y="388" width="4" height="12" fill="#ff7a1a"/>`));
-    o.push(`<line x1="${xs[0]}" y1="392" x2="${xs[3]}" y2="392" stroke="#ff7a1a" stroke-dasharray="6 5"/>`);
-  }else{
-    xs.forEach(x=>{
-      if(s>=2)o.push(`<rect x="${x-30}" y="403" width="60" height="24" fill="${C}" filter="url(#shd)"/>`);
-      else{o.push(`<rect x="${x-30}" y="403" width="60" height="24" fill="none" stroke="${R}" stroke-width="2"/>`);for(let k=-22;k<=22;k+=11)o.push(`<line x1="${x+k}" y1="405" x2="${x+k}" y2="425" stroke="${R}"/>`)}
-    });
-    if(s>=2)o.push(`<rect x="${xs[0]}" y="403" width="${xs[3]-xs[0]}" height="10" fill="${C}" filter="url(#shd)"/>`);
-    else o.push(`<line x1="${xs[0]}" y1="408" x2="${xs[3]}" y2="408" stroke="${R}" stroke-width="2"/>`);
-  }
-  for(let f=0;f<L;f++){
-    const rb=3+2*f,cc=4+2*f;if(s<rb)break;
-    const base=GY-f*pitch,top=base-colH;
-    if(s>=cc){
-      xs.forEach(x=>o.push(`<rect x="${x-9}" y="${top}" width="18" height="${colH}" fill="${C}" filter="url(#shd)"/>`));
-      o.push(`<rect x="170" y="${top-12}" width="460" height="12" fill="${C}" filter="url(#shd)"/>`);
-      if(f<L-1&&s<rb+2)xs.forEach(x=>[-5,5].forEach(d=>o.push(`<line x1="${x+d}" y1="${top-12}" x2="${x+d}" y2="${top-30}" stroke="${R}" stroke-width="2"/>`)));
-    }else{
-      xs.forEach(x=>{[-5,5].forEach(d=>o.push(`<line x1="${x+d}" y1="${base}" x2="${x+d}" y2="${top-18}" stroke="${R}" stroke-width="2"/>`));for(let y=base-4;y>top;y-=9)o.push(`<line x1="${x-6}" y1="${y}" x2="${x+6}" y2="${y}" stroke="${R}"/>`)});
-      o.push(`<line x1="170" y1="${top-3}" x2="630" y2="${top-3}" stroke="${R}" stroke-width="2"/><line x1="170" y1="${top-10}" x2="630" y2="${top-10}" stroke="${R}" stroke-width="2"/>`);
-      for(let x=172;x<630;x+=14)o.push(`<line x1="${x}" y1="${top-10}" x2="${x}" y2="${top-3}" stroke="${R}"/>`);
-    }
-  }
-  o.push('</svg>');return o.join('');
-}
-function stageLabelHero(s){
-  const T=D();if(s===0)return T.sLand;if(s===1)return T.sRF;if(s===2)return T.sCF;
-  const f=Math.floor((s-3)/2),rebar=(s-3)%2===0,lv=f===0?T.gf:T.fl+' '+f;
-  return (rebar?T.sRC:T.sCC)+' — '+lv;
-}
 
 /* ---------- Firebase: projects + reviews ---------- */
 let ALL=[],backend=null;
@@ -576,32 +529,10 @@ function applyLang(l){
 }
 $('#lang').addEventListener('click',()=>applyLang(lang==='ar'?'fr':'ar'));
 
-/* ---------- hero loop + intro ---------- */
-let heroTimer=null,introTimer=null;
-function startHero(){
-  const n=11; // 3 + 2*4 levels
-  let s=0;
-  function frame(){
-    $('#heroSvg').innerHTML=drawStage(s);
-    $('#heroLbl').textContent=stageLabelHero(s);
-    $('#heroNo').textContent=String(s+1).padStart(2,'0')+' / '+String(n).padStart(2,'0');
-    $('#heroBar').style.width=((s+1)/n*100)+'%';
-    s=(s+1)%n;
-  }
-  frame();
-  if(!RM){clearInterval(heroTimer);heroTimer=setInterval(frame,1400)}
-  let k=0;const iv=$('#introSvg');
-  if(iv){
-    iv.innerHTML=drawStage(0);
-    clearInterval(introTimer);
-    introTimer=setInterval(()=>{k++;if(k>=n){clearInterval(introTimer);return}iv.innerHTML=drawStage(k)},350);
-  }
-}
-startHero();
-
+/* ---------- intro ---------- */
 const intro=$('#intro');
 function endIntro(){if(!intro||intro.dataset.done)return;intro.dataset.done=1;intro.classList.add('out');document.body.classList.remove('lock');setTimeout(()=>intro.remove(),800)}
-if(RM){intro.remove();document.body.classList.remove('lock')}else{intro.addEventListener('click',endIntro);setTimeout(endIntro,5000)}
+if(RM){intro.remove();document.body.classList.remove('lock')}else{intro.addEventListener('click',endIntro);setTimeout(endIntro,3000)}
 
 /* ---------- reveal, counters, scroll-spy ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{
