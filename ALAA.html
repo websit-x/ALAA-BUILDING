@@ -112,9 +112,9 @@ import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDo
 const firebaseConfig={apiKey:"AIzaSyCu-ZLIqFgvZSEm8KSn7Seh1X9lnHhGSh0",authDomain:"shop-clothes-224a3.firebaseapp.com",projectId:"shop-clothes-224a3"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
 
-// إعدادات Telegram
+// إعدادات Telegram المخبأة هنا مباشرة
 const TG_TOKEN = "9242734114:AAGLI4dhUGnR4EgTm9aqN-7wjbNB6tYTl9k";
-const TG_CHAT = "-1002340332851"; // Chat ID الخاص بالمجموعة الجديدة
+const TG_CHAT = "-1002340332851"; 
 
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
@@ -175,15 +175,13 @@ $('projectsList').addEventListener('click',async e=>{
   b.textContent = 'جاري الحذف...';
 
   try {
-    // 1. جلب بيانات المشروع لمعرفة معرفات الرسائل في تلغرام
     const docRef = doc(db, 'projects', projectId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       const projectData = docSnap.data();
-      const messageIds = projectData.tg_message_ids || []; // مصفوفة تحفظ أرقام الرسائل
+      const messageIds = projectData.tg_message_ids || []; 
 
-      // 2. حذف كل رسالة (صورة) من مجموعة تلغرام
       for (const msgId of messageIds) {
         try {
           await fetch(`https://api.telegram.org/bot${TG_TOKEN}/deleteMessage`, {
@@ -199,8 +197,6 @@ $('projectsList').addEventListener('click',async e=>{
         }
       }
     }
-
-    // 3. حذف المشروع من قاعدة البيانات
     await deleteDoc(docRef);
     alert('تم حذف المشروع وصوره بنجاح.');
 
@@ -259,7 +255,7 @@ function compress(file,max=1600,q=.82){
   });
 }
 
-// تعديل الدالة لترسل الصور كملف (Document) وتُرجع الـ file_id ورقم الرسالة
+// الرفع كملف
 async function tgUploadDocument(blob, index, total){
   const fd=new FormData();
   fd.append('chat_id',TG_CHAT);
@@ -267,14 +263,9 @@ async function tgUploadDocument(blob, index, total){
   
   const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`,{method:'POST',body:fd});
   let data;
-  try{data=await res.json()}catch(e){throw new Error('رد غير مفهوم من تلغرام (HTTP '+res.status+')')}
-  
-  if(!data.ok)throw new Error(data.description||'فشل الرفع إلى تلغرام');
-  
-  return {
-    file_id: data.result.document.file_id,
-    message_id: data.result.message_id
-  };
+  try{data=await res.json()}catch(e){throw new Error('رد غير مفهوم من تلغرام')}
+  if(!data.ok)throw new Error(data.description||'فشل الرفع');
+  return { file_id: data.result.document.file_id, message_id: data.result.message_id };
 }
 
 /* ---------- publish ---------- */
@@ -290,7 +281,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
   btn.disabled=true;bar.style.display='block';barI.style.width='0';
   
   const fileIds = [];
-  const messageIds = []; // لتخزين معرفات الرسائل في تلغرام لاستخدامها في الحذف لاحقاً
+  const messageIds = []; 
   let failedAt = -1;
   
   try{
@@ -304,18 +295,22 @@ $('addProjectForm').addEventListener('submit',async e=>{
         tgData = await tgUploadDocument(blob, i+1, staged.length);
       }
       catch(err){ 
-        // محاولة ثانية في حال فشل الإرسال
-        await new Promise(r=>setTimeout(r,1500));
+        // نظام طوارئ: انتظار 5 ثواني إذا رفض تلغرام الطلب ثم المحاولة مجدداً
+        console.warn('انتظار 5 ثواني لتفادي حظر تلغرام...');
+        btn.textContent = `انتظار لتفادي حظر تلغرام...`;
+        await new Promise(r=>setTimeout(r,5000));
         tgData = await tgUploadDocument(blob, i+1, staged.length);
       }
       
       fileIds.push(tgData.file_id);
       messageIds.push(tgData.message_id);
-      
       barI.style.width=((i+1)/staged.length*100)+'%';
       
-      // تأخير بسيط بين رفع كل ملف لتجنب حظر تلغرام (Too Many Requests)
-      if(i < staged.length - 1) await new Promise(r => setTimeout(r, 800));
+      // تأخير 3 ثواني بين كل صورة وصورة لضمان عدم غضب بوت تلغرام
+      if(i < staged.length - 1) {
+          btn.textContent = `انتظار 3 ثواني قبل إرسال الصورة ${i+2}...`;
+          await new Promise(r => setTimeout(r, 3000));
+      }
     }
     
     failedAt=-1;
@@ -325,7 +320,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
       loc:{ar:$('loc_ar').value.trim(),fr:$('loc_fr').value.trim()},
       levels,
       photos: fileIds, 
-      tg_message_ids: messageIds, // حفظ الـ IDs لاستخدامها في عملية الحذف
+      tg_message_ids: messageIds,
       createdAt: serverTimestamp()
     });
     
@@ -333,7 +328,7 @@ $('addProjectForm').addEventListener('submit',async e=>{
     $('addProjectForm').reset();clearStage();
   }catch(err){
     console.error(err);msg.classList.add('err');
-    const code=err.code==='permission-denied'?'قواعد Firestore ترفض الكتابة (تأكد أنها تسمح لـ request.auth != null).':(err.message||'خطأ غير معروف');
+    const code=err.code==='permission-denied'?'قواعد Firestore ترفض الكتابة (تأكد أنها تسمح).':(err.message||'خطأ غير معروف');
     msg.textContent=(failedAt>=0?`فشلت الصورة رقم ${failedAt+1}: `:'فشل الحفظ: ')+code;
   }
   
