@@ -27,7 +27,6 @@ html[lang=ar] *{letter-spacing:0!important}
 .bg{position:fixed;inset:0;z-index:-2;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse at 50% 20%,#000 10%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 20%,#000 10%,transparent 75%)}
 .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(600px circle at 80% 8%,rgba(255,122,26,.10),transparent 60%)}
 
-/* intro */
 #intro{position:fixed;inset:0;z-index:999;background:#0a0b0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .7s,visibility .7s;cursor:pointer;padding:20px}
 #intro.out{opacity:0;visibility:hidden}
 .intro-wrap{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:nowrap;direction:ltr}
@@ -37,7 +36,6 @@ html[lang=ar] *{letter-spacing:0!important}
 #intro .ld i{display:block;height:100%;width:0;background:var(--or);animation:ldw 3s linear forwards}
 @keyframes ldw{to{width:100%}}
 
-/* nav */
 .bar{position:fixed;top:14px;left:0;right:0;margin-inline:auto;width:min(1120px,calc(100% - 28px));z-index:60;display:flex;align-items:center;gap:14px;padding:9px 12px 9px 24px;padding-inline:24px 12px;border-radius:999px;background:rgba(18,18,20,.66);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line)}
 .logo{font:800 1.05rem 'Cairo';display:flex;align-items:center;gap:9px}
 .logo img{width:28px;height:28px;border-radius:50%;border:1px solid var(--or);object-fit:cover}
@@ -48,7 +46,6 @@ html[lang=ar] *{letter-spacing:0!important}
 .lg{background:var(--p1);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font:700 .8rem 'Barlow Condensed',sans-serif;letter-spacing:.06em;transition:.2s}
 .lg:hover{background:var(--p2);border-color:rgba(255,255,255,.3)}
 
-/* layout */
 .sec{max-width:1120px;margin:0 auto;padding:110px 20px 20px}
 .rv{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s;transition-delay:calc(var(--i,0)*.08s)}
 .rv.in{opacity:1;transform:none}
@@ -66,7 +63,6 @@ html[lang=ar] *{letter-spacing:0!important}
 .cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .chip{display:inline-block;font:600 .78rem 'Cairo';padding:4px 12px;border-radius:8px;border:1px solid var(--line);background:var(--p1);color:#d2d2d6}
 
-/* hero (Full Screen Video Background) */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 20px 60px;overflow:hidden;width:100%}
 .hero-vid{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-2}
 .hero-over{position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,14,16,0.65) 0%, var(--bg) 100%);z-index:-1}
@@ -79,12 +75,10 @@ html[lang=ar] *{letter-spacing:0!important}
 .st small{color:var(--mut);font-size:.8rem}
 .st b{display:block;font:800 2.6rem/1.1 'Barlow Condensed',sans-serif;color:#fff}
 
-/* text box */
 .glass{border:1px solid var(--line);border-radius:24px;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015))}
 .glass h3{font:800 1.4rem 'Cairo'}.glass>p{color:var(--mut);font-size:.9rem;margin:4px 0 16px}
 .glass form .btn{width:100%}
 
-/* projects */
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-top:34px}
 .pc{border:1px solid var(--line);border-radius:18px;background:var(--p1);overflow:hidden;cursor:pointer;transition:transform .35s,border-color .3s,background .3s;text-align:start;display:flex;flex-direction:column;width:100%}
 .pc:hover{transform:translateY(-6px);border-color:rgba(255,122,26,.5);background:var(--p2)}
@@ -98,7 +92,6 @@ html[lang=ar] *{letter-spacing:0!important}
 .rt{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--mut)}
 .rt b{color:#fff}
 
-/* modal */
 .mod{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px)}
 .mod.on{display:flex;animation:in .3s both}
 @keyframes in{from{opacity:0;transform:translateY(12px)}}
@@ -141,7 +134,6 @@ textarea{min-height:76px}
 .mut{color:var(--mut);font-size:.9rem}
 .mx{position:absolute;top:10px;inset-inline-end:10px;z-index:5;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid var(--line);font-size:1rem}
 
-/* contact */
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:920px;margin:34px auto 0}
 .soc a{display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:13px;border:1px solid var(--line);background:var(--p1);transition:.28s;margin-bottom:10px}
 .soc a:hover{background:var(--p2);border-color:rgba(255,122,26,.5);transform:translateX(calc(5px * var(--dir)))}
@@ -167,6 +159,26 @@ footer a:hover{color:#fff}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{position:absolute;width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:spin .8s linear infinite;z-index:1}
+
+.view{touch-action:pan-y;-webkit-user-select:none;user-select:none;overscroll-behavior:contain}
+.view img{-webkit-user-drag:none;will-change:transform;transform-origin:50% 50%}
+.view.big{position:fixed;inset:0;z-index:500;aspect-ratio:auto;border-radius:0;border:none;background:#000}
+.fs{display:none;position:fixed;z-index:510;width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid var(--line);color:#fff;font-size:1.4rem;place-items:center}
+.view.big~.fs{display:grid}
+.fs.x{top:14px;inset-inline-end:14px}
+.fs.l{left:12px;top:50%;transform:translateY(-50%)}
+.fs.r{right:12px;top:50%;transform:translateY(-50%)}
+
+/* ===== NEW: floating contact buttons ===== */
+.fabs{position:fixed;inset-inline-end:16px;bottom:22px;z-index:70;display:flex;flex-direction:column;gap:10px;align-items:center}
+.fab{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;min-width:54px;border-radius:999px;box-shadow:0 10px 28px rgba(0,0,0,.5);transition:transform .2s;color:#fff;font:800 .9rem 'Cairo'}
+.fab:hover{transform:translateY(-3px) scale(1.04)}
+.fab svg{width:26px;height:26px;fill:currentColor;flex:none}
+.fab.wa{background:#25D366;width:58px;height:58px;padding:0;color:#fff}
+.fab.wa svg{width:34px;height:34px}
+.fab.call{background:var(--or);color:#140a02}
+@media(min-width:721px){.fab.call{display:none}}
+@media(max-width:720px){.fabs{bottom:84px}}
 </style>
 </head>
 <body class="lock">
@@ -174,7 +186,7 @@ footer a:hover{color:#fff}
 
 <div id="intro" aria-hidden="true">
   <div class="intro-wrap">
-    <img src="youcef.png" alt="Logo" class="intro-logo" onerror="this.style.display='none'">
+    <img src="chikor.png" alt="Logo" class="intro-logo" onerror="this.style.display='none'">
   </div>
   <h1 data-i18n="intro"></h1>
   <div class="ld"><i></i></div>
@@ -182,7 +194,7 @@ footer a:hover{color:#fff}
 
 <header class="bar">
   <a class="logo" href="#home">
-    <img src="youcef.png" alt="" onerror="this.style.display='none'">
+    <img src="chikor.png" alt="" onerror="this.style.display='none'">
     <span id="brand"></span>
   </a>
   <nav class="links" aria-label="Main">
@@ -197,8 +209,8 @@ footer a:hover{color:#fff}
 <main>
 <!-- Hero Section with Full Background Video -->
 <section id="home" class="hero">
-  <video class="hero-vid" autoplay loop muted playsinline>
-    <source src="video_14959146249537651817_y.mp4" type="video/mp4">
+  <video class="hero-vid" autoplay loop muted playsinline poster="youcef.png">
+    <source src="youcef.mp4" type="video/mp4">
   </video>
   <div class="hero-over"></div>
   
@@ -256,17 +268,28 @@ footer a:hover{color:#fff}
 
 <footer><span id="copy"></span><span data-i18n="foot"></span><a href="#home" data-i18n="top"></a></footer>
 
+<!-- NEW: floating contact buttons -->
+<div class="fabs">
+  <a class="fab call" id="fabCall" aria-label="Call / اتصال" title="Call"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></a>
+  <a class="fab wa" id="fabWa" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+</div>
+
 <!-- project modal -->
 <div class="mod" id="mod" role="dialog" aria-modal="true">
   <div class="mbox">
     <button class="mx" id="mclose" aria-label="Close">✕</button>
     <div class="vw">
       <div class="view" id="view"></div>
+      <!-- NEW: fullscreen controls (shown only in fullscreen viewer) -->
+      <button class="fs x" id="bX" aria-label="Close fullscreen">✕</button>
+      <button class="fs l" id="bFL" aria-label="left">‹</button>
+      <button class="fs r" id="bFR" aria-label="right">›</button>
       <div class="slabel" id="slabel"></div>
       <div class="ctl">
         <button class="ib" id="bPrev" aria-label="prev">‹</button>
         <button class="ib" id="bPlay" aria-label="play">▶</button>
         <button class="ib" id="bNext" aria-label="next">›</button>
+        <button class="ib" id="bFull" aria-label="fullscreen">⤢</button>
         <input type="range" id="rng" min="0" max="0" value="0">
       </div>
       <div class="dots" id="dots"></div>
@@ -296,9 +319,6 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* =====================================================
-   1) company data
-   ===================================================== */
 const CFG={
   name:{ar:"ALAA BUILDING",fr:"ALAA BUILDING"},
   startYear:2014,
@@ -308,14 +328,8 @@ const CFG={
   mapUrl:"https://maps.google.com/?q=Oran"
 };
 
-/* =====================================================
-   2) Firebase (Firestore)
-   ===================================================== */
 const FB={apiKey:"AIzaSyCu-ZLIqFgvZSEm8KSn7Seh1X9lnHhGSh0",authDomain:"shop-clothes-224a3.firebaseapp.com",projectId:"shop-clothes-224a3"};
 
-/* =====================================================
-   3) Telegram image fetcher
-   ===================================================== */
 const TG_TOKEN="9242734114:AAGLI4dhUGnR4EgTm9aqN-7wjbNB6tYTl9k";
 const tgCache=new Map();
 async function getTgUrl(fileId){
@@ -334,15 +348,14 @@ async function getTgUrl(fileId){
 
 let PROJECTS=[];
 
-/* ---------- i18n ---------- */
 const I={
 ar:{intro:"مؤسسة علاء لأشغال البناء",nHome:"الرئيسية",nServices:"خدماتنا",nProjects:"أعمالنا",nContact:"تواصل",
  eyebrow:"مؤسسة علاء لأشغال البناء في مختلف مراحله E.T.B  T.C.E",h1a:"من الحديد",h1b:"إلى الهيكل",
- lead:"بناء مختلف البنايات للاستعمال المهني ، الإجتماعي أو الترفيهي",
+ lead:"ننجز الهياكل الخرسانية كاملة: من تسليح الأساسات إلى صب آخر بلاطة، بدقة والتزام بمخططات المهندس. بناء مختلف البنايات للاستعمال المهني ، الإجتماعي أو الترفيهي.",
  scope:"نسلّم الهيكل الخرساني فقط",ctaProj:"شاهد مشاريعنا",ctaQuote:"اطلب عرض سعر",
  st1:"مشروع منجز",st3:"سنوات خبرة",
  svT:"عملنا",
- svText:"نتميز في <b style='color:var(--or)'>ALAA BUILDING</b> بالاحترافية العالية في تنفيذ كافة أعمال الخرسانة المسلحة والهياكل الإنشائية للمباني السكنية والتجارية، بدءاً من أعمال الحفر والتأسيس وحتى صب الأسقف والأعمدة، مع الالتزام التام بالمخططات الهندسية واشتراطات الكود الهندسي المعتمد.<br><br><b style='color:var(--or);'>نقاط قوتنا في تنفيذ الخرسانات:</b><ul style='margin-top:12px;margin-inline-start:24px;display:flex;flex-direction:column;gap:8px;text-align:start;'><li><b>الدقة الشديدة في التسليح:</b> استخدام أفضل الطرق والالتزام بالمسافات والأقطار المحددة في المخطط الإنشائي دون أي تهاون.</li><li><b>الشدات الخشبية والعدّة:</b> استخدام شدات خشبية ومعدنية عالية الجودة لضمان استقامة وحداثة الأسطح الخرسانية.</li><li><b>ضبط جودة الخرسانة:</b> الإشراف المباشر على عمليات الصب، الاهتزازي (Vibration)، والمعالجة المائية (Curing) لضمان الوصول للمقاومة المطلوبة.</li></ul>",
+ svText:"نعمل باحترافية العالية في تنفيذ كافة أعمال الخرسانة المسلحة و الهياكل الإنشائية للمباني السكنية و التجارية، بدءا من البنية التحتية تشمل كل من خرسانة النظافة و الأساسات و تطبيق مادة فلينتكوت للأساسات - القاعدة، والجدار المحيطي بما في ذلك تركيب وضبط طبقة الحصى، وجميع متطلبات التنفيذ السليم.<br><br><b>2- الصرف الصحي الداخلي</b><br>فتحات تفتيش خرسانية مسلحة تحت الكتل تشمل تركيب أنابيب PVC، والحفر، وتجصيص الجدران، والتجصيص باستخدام مادة فلينتكوت، وجميع قيود التنفيذ إلى آخر مرحلة البناء .<br><br>مع إحترام الوقت المحدد في الإنجاز ، و الالتزام التام بالمخططات الهندسية واشتراطات الكود الهندسي المعتمد.",
  pjT:"مشاريعنا",pjS:"تصفح صور مشاريعنا الحقيقية من أرض الواقع، وشاركنا تقييمك.",
  open:"شاهد الصور ←",floors:"طوابق",photoLbl:"صورة",
  rate:"قيّم هذا المشروع",phName:"اسمك",phCom:"تعليقك (اختياري)",phMsg:"رسالتك",post:"نشر التقييم",reviews:"التعليقات",noRev:"لا توجد تعليقات بعد — كن الأول.",noRate:"لا تقييمات بعد",
@@ -351,11 +364,11 @@ ar:{intro:"مؤسسة علاء لأشغال البناء",nHome:"الرئيسي�
  direct:"تواصل مباشر",directS:"نرد في أقرب وقت.",call:"اتصال هاتفي",where:"الموقع",wa:"مرحباً، أنا",foot:"هيكل متين. عمل نظيف.",top:"العودة للأعلى ↑"},
 fr:{intro:"ALAA BUILDING",nHome:"Accueil",nServices:"Notre Travail",nProjects:"Réalisations",nContact:"Contact",
  eyebrow:"ENTREPRISE ALAA DE TRAVAUX BÂTIMENT TOUS CORPS D'ÉTAT E.T.B T.C.E",h1a:"Du ferraillage",h1b:"à la structure",
- lead:"Construction de divers bâtiments à usage professionnel, social ou récréatif.",
+ lead:"Nous réalisons des structures en béton armé complètes : du ferraillage des fondations au coulage de la dernière dalle, avec précision et dans le respect des plans. Construction de divers bâtiments à usage professionnel, social ou récréatif.",
  scope:"Structure béton uniquement",ctaProj:"Voir nos réalisations",ctaQuote:"Demander un devis",
  st1:"PROJETS RÉALISÉS",st3:"ANS D'EXPÉRIENCE",
  svT:"Notre Travail",
- svText:"Chez <b style='color:var(--or)'>ALAA BUILDING</b>, nous nous distinguons par notre grand professionnalisme dans l'exécution de tous les travaux de béton armé et de structures pour les bâtiments résidentiels et commerciaux, des fouilles et fondations jusqu'au coulage des dalles et poteaux, dans le strict respect des plans et des normes d'ingénierie.<br><br><b style='color:var(--or);'>Nos points forts :</b><ul style='margin-top:12px;margin-inline-start:24px;display:flex;flex-direction:column;gap:8px;text-align:start;'><li><b>Ferraillage de haute précision :</b> Utilisation des meilleures méthodes et respect strict des espacements et diamètres définis dans les plans d'exécution.</li><li><b>Coffrage et étaiement :</b> Utilisation de coffrages en bois et métalliques de haute qualité pour garantir l'aplomb et la finition des surfaces.</li><li><b>Contrôle qualité du béton :</b> Supervision directe du coulage, de la vibration et de la cure pour garantir la résistance requise.</li></ul>",
+ svText:"Nous travaillons avec un grand professionnalisme dans l'exécution de tous les travaux de béton armé et de structures pour les bâtiments résidentiels et commerciaux. À commencer par l'infrastructure comprenant le béton de propreté, les fondations, l'application de Flintkote pour les fondations - base, le mur périphérique incluant la mise en place et le réglage de la couche de gravier, et toutes les exigences d'une bonne exécution.<br><br><b>2- Assainissement Interne</b><br>Regards de visite en béton armé sous dallage incluant la pose de canalisations en PVC, terrassement, crépissage des parois, enduit Flintkote, et toutes sujétions d'exécution jusqu'à la dernière phase de construction.<br><br>Le tout dans le respect des délais de réalisation, la stricte conformité aux plans et aux normes d'ingénierie approuvées.",
  pjT:"Nos réalisations",pjS:"Parcourez les vraies photos de nos chantiers et laissez votre avis.",
  open:"Voir les photos →",floors:"niveaux",photoLbl:"Photo",
  rate:"Notez ce projet",phName:"Votre nom",phCom:"Votre commentaire (facultatif)",phMsg:"Votre message",post:"Publier",reviews:"Commentaires",noRev:"Aucun commentaire — soyez le premier.",noRate:"Pas encore de note",
@@ -367,7 +380,6 @@ let lang='ar';
 const D=()=>I[lang];
 
 
-/* ---------- Firebase: projects + reviews ---------- */
 let ALL=[],backend=null;
 
 async function cloudBackend(){
@@ -389,7 +401,6 @@ async function cloudBackend(){
 function stat(pid){const a=ALL.filter(r=>r.pid===pid&&r.stars>=1&&r.stars<=5);const n=a.length;return{n,avg:n?a.reduce((t,r)=>t+Number(r.stars),0)/n:0}}
 const starsHTML=v=>`<span class="stars" style="--v:${Math.max(0,Math.min(5,v))/5*100}%" aria-label="${v.toFixed?v.toFixed(1):v}/5">★★★★★</span>`;
 
-/* ---------- render ---------- */
 function renderStatic(){
   const total=PROJECTS.length,years=Math.max(0,new Date().getFullYear()-CFG.startYear);
   $('#brand').textContent=CFG.name[lang];document.title=CFG.name[lang];
@@ -425,11 +436,11 @@ function refreshStats(){
   if(cur>=0)renderRev();
 }
 
-/* ---------- photo slider modal ---------- */
 let cur=-1,stg=0,timer=null,myStars=0;
 const mod=$('#mod');
 
 async function setStage(s){
+  zReset();
   const p=PROJECTS[cur];if(!p)return;
   const n=p.photos?p.photos.length:0;
   if(n===0){
@@ -439,7 +450,7 @@ async function setStage(s){
   }
   stg=Math.max(0,Math.min(n-1,s));
   const my=cur,mine=stg;
-  $('#view').innerHTML=`<span class="badge" style="z-index:3">${stg+1} / ${n}</span><i class="spin"></i><img src="" id="mainImg" onload="this.style.opacity=1" style="opacity:0;transition:opacity .4s;position:relative;z-index:2">`;
+  $('#view').innerHTML=`<span class="badge" style="z-index:3">${stg+1} / ${n}</span><i class="spin"></i><img src="" id="mainImg" draggable="false" onload="this.style.opacity=1" style="opacity:0;transition:opacity .4s;position:relative;z-index:2">`;
   const url=await getTgUrl(p.photos[stg]);
   const imgEl=document.getElementById('mainImg');
   if(imgEl&&cur===my&&stg===mine){imgEl.src=url;}
@@ -473,6 +484,80 @@ function openProj(i){
 }
 
 function closeProj(){stopPlay();mod.classList.remove('on');document.body.classList.remove('lock');cur=-1}
+
+const V=$('#view');
+const Z={s:1,x:0,y:0,pts:new Map(),pinch:false,pd:1,sx:0,sy:0,bx:0,by:0,moved:false,t0:0,lastTap:0};
+const rel=(x,y)=>{const r=V.getBoundingClientRect();return{x:x-r.left-r.width/2,y:y-r.top-r.height/2}};
+const step=a=>a==='R'?(lang==='ar'?-1:1):(lang==='ar'?1:-1); // same logic as the keyboard arrows
+function zApply(){
+  const im=document.getElementById('mainImg');
+  if(im)im.style.transform=Z.s>1?`translate(${Z.x}px,${Z.y}px) scale(${Z.s})`:'';
+  V.style.touchAction=(Z.s>1||V.classList.contains('big'))?'none':'pan-y';
+}
+function zClamp(){
+  const r=V.getBoundingClientRect(),mx=(Z.s-1)*r.width/2,my=(Z.s-1)*r.height/2;
+  Z.x=Math.max(-mx,Math.min(mx,Z.x));Z.y=Math.max(-my,Math.min(my,Z.y));
+}
+function zReset(){Z.s=1;Z.x=0;Z.y=0;Z.pts.clear();Z.pinch=false;V.style.touchAction=V.classList.contains('big')?'none':'pan-y'}
+function zoomTo(ns,mx,my){
+  ns=Math.max(1,Math.min(5,ns));
+  if(ns<1.02){Z.s=1;Z.x=0;Z.y=0}
+  else{Z.x=mx-(mx-Z.x)*ns/Z.s;Z.y=my-(my-Z.y)*ns/Z.s;Z.s=ns;zClamp()}
+  zApply();
+}
+V.addEventListener('pointerdown',e=>{
+  if(!document.getElementById('mainImg'))return;
+  try{V.setPointerCapture(e.pointerId)}catch(_){}
+  Z.pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(Z.pts.size===1){Z.sx=e.clientX;Z.sy=e.clientY;Z.bx=Z.x;Z.by=Z.y;Z.moved=false;Z.t0=Date.now()}
+  else if(Z.pts.size===2){const[a,b]=[...Z.pts.values()];Z.pd=Math.hypot(a.x-b.x,a.y-b.y)||1;Z.pinch=true;Z.moved=true}
+});
+V.addEventListener('pointermove',e=>{
+  if(!Z.pts.has(e.pointerId))return;
+  Z.pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(Z.pts.size>=2){
+    const[a,b]=[...Z.pts.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,c=rel((a.x+b.x)/2,(a.y+b.y)/2);
+    zoomTo(Z.s*d/Z.pd,c.x,c.y);Z.pd=d;return;
+  }
+  const dx=e.clientX-Z.sx,dy=e.clientY-Z.sy;
+  if(Math.abs(dx)>8||Math.abs(dy)>8)Z.moved=true;
+  if(Z.s>1){Z.x=Z.bx+dx;Z.y=Z.by+dy;zClamp();zApply()}
+});
+function zUp(e,cancel){
+  if(!Z.pts.has(e.pointerId))return;
+  Z.pts.delete(e.pointerId);
+  if(Z.pinch){
+    if(Z.pts.size===1){const p=[...Z.pts.values()][0];Z.sx=p.x;Z.sy=p.y;Z.bx=Z.x;Z.by=Z.y}
+    if(Z.pts.size===0)Z.pinch=false;
+    return;
+  }
+  if(cancel)return;
+  const dx=e.clientX-Z.sx,dy=e.clientY-Z.sy,now=Date.now();
+  if(Z.s===1&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){stopPlay();setStage(stg+step(dx<0?'R':'L'));return}
+  if(!Z.moved&&now-Z.t0<350){
+    if(now-Z.lastTap<320){Z.lastTap=0;const c=rel(e.clientX,e.clientY);Z.s>1?zoomTo(1,0,0):zoomTo(2.5,c.x,c.y)}
+    else Z.lastTap=now;
+  }
+}
+V.addEventListener('pointerup',e=>zUp(e,false));
+V.addEventListener('pointercancel',e=>zUp(e,true));
+V.addEventListener('wheel',e=>{
+  if(!document.getElementById('mainImg'))return;
+  e.preventDefault();const c=rel(e.clientX,e.clientY);
+  zoomTo(Z.s*(e.deltaY<0?1.2:1/1.2),c.x,c.y);
+},{passive:false});
+
+function toggleBig(on){V.classList.toggle('big',on);zReset();zApply()}
+$('#bFull').addEventListener('click',()=>toggleBig(!V.classList.contains('big')));
+$('#bX').addEventListener('click',()=>toggleBig(false));
+$('#bFL').addEventListener('click',()=>{stopPlay();setStage(stg+step('L'))});
+$('#bFR').addEventListener('click',()=>{stopPlay();setStage(stg+step('R'))});
+// registered BEFORE the existing keydown handler so Esc leaves fullscreen first
+addEventListener('keydown',e=>{
+  if(!mod.classList.contains('on'))return;
+  if(e.key==='Escape'&&V.classList.contains('big')){e.stopImmediatePropagation();toggleBig(false)}
+});
+
 $('#mclose').addEventListener('click',closeProj);
 mod.addEventListener('click',e=>{if(e.target===mod)closeProj()});
 addEventListener('keydown',e=>{if(!mod.classList.contains('on'))return;if(e.key==='Escape')closeProj();const rtl=lang==='ar';if(e.key==='ArrowRight'){stopPlay();setStage(stg+(rtl?-1:1))}if(e.key==='ArrowLeft'){stopPlay();setStage(stg+(rtl?1:-1))}});
@@ -481,7 +566,6 @@ $('#bNext').addEventListener('click',()=>{stopPlay();setStage(stg+1)});
 $('#bPlay').addEventListener('click',()=>timer?stopPlay():startPlay());
 $('#rng').addEventListener('input',e=>{stopPlay();setStage(+e.target.value)});
 
-/* ---------- reviews UI ---------- */
 function paintStarIn(){$$('#starin button').forEach((b,i)=>b.classList.toggle('on',i<myStars))}
 $('#starin').innerHTML=[1,2,3,4,5].map(k=>`<button type="button" data-k="${k}" aria-label="${k}">★</button>`).join('');
 $$('#starin button').forEach(b=>b.addEventListener('click',()=>{myStars=+b.dataset.k;paintStarIn()}));
@@ -509,13 +593,11 @@ $('#rpost').addEventListener('click',async()=>{
   $('#rpost').disabled=false;
 });
 
-/* ---------- contact -> WhatsApp ---------- */
 $('#cf').addEventListener('submit',e=>{
   e.preventDefault();const n=$('#cn').value.trim(),m=$('#cm').value.trim();if(!n||!m)return;
   window.open('https://wa.me/'+CFG.wa+'?text='+encodeURIComponent(`${D().wa} ${n}.\n\n${m}`),'_blank','noopener');
 });
 
-/* ---------- language ---------- */
 function applyLang(l){
   lang=l;const T=I[l];
   document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';
@@ -528,12 +610,10 @@ function applyLang(l){
 }
 $('#lang').addEventListener('click',()=>applyLang(lang==='ar'?'fr':'ar'));
 
-/* ---------- intro ---------- */
 const intro=$('#intro');
 function endIntro(){if(!intro||intro.dataset.done)return;intro.dataset.done=1;intro.classList.add('out');document.body.classList.remove('lock');setTimeout(()=>intro.remove(),800)}
 if(RM){intro.remove();document.body.classList.remove('lock')}else{intro.addEventListener('click',endIntro);setTimeout(endIntro,3000)}
 
-/* ---------- reveal, counters, scroll-spy ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{
   if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);
   const b=e.target.querySelector('b[id^=s]');
@@ -543,7 +623,22 @@ function observeRv(){$$('.rv:not(.in)').forEach(el=>io.observe(el))}
 const links=$$('.links a'),so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
 ['home','services','projects','contact'].forEach(id=>so.observe(document.getElementById(id)));
 
-/* ---------- boot ---------- */
+$('#fabWa').href='https://wa.me/'+CFG.wa;
+$('#fabCall').href='tel:'+CFG.phone;
+
+(function(){
+  const v=$('.hero-vid');if(!v)return;
+  const c=navigator.connection||{};
+  if(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')){
+    v.removeAttribute('autoplay');v.pause();
+    const s=v.querySelector('source');if(s)s.remove();
+    v.load();return;
+  }
+  new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){const p=v.play();if(p&&p.catch)p.catch(()=>{})}else v.pause();
+  })).observe(v);
+})();
+
 const sl=store.get('lang');applyLang(I[sl]?sl:'ar');observeRv();
 (async()=>{
   try{
