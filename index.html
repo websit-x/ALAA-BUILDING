@@ -11,6 +11,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Barlow+Condensed:wght@600;800&display=swap" rel="stylesheet">
+
+<!-- تحميل مسبق لصورة الغلاف لتظهر في لمح البصر قبل الفيديو -->
+<link rel="preload" as="image" href="bg.jpg">
+
 <style>
 :root{--bg:#0d0e10;--p1:rgba(255,255,255,.04);--p2:rgba(255,255,255,.08);--line:rgba(255,255,255,.11);--txt:#f2f2f0;--mut:#9a9aa0;--dim:#62626a;--or:#ff7a1a;--dir:1}
 html[dir=ltr]{--dir:1}html[dir=rtl]{--dir:-1}
@@ -207,10 +211,11 @@ footer a:hover{color:#fff}
 </header>
 
 <main>
-<!-- Hero Section with Full Background Video -->
+<!-- هنا تم إضافة الصيغتين معاً داخل الوسم video -->
 <section id="home" class="hero">
-  <video class="hero-vid" autoplay loop muted playsinline poster="youcef.png">
-    <source src="youcef.mp4" type="video/mp4">
+  <video class="hero-vid" autoplay loop muted playsinline poster="bg.jpg">
+    <source src="bg.webm" type="video/webm">
+    <source src="bg.mp4" type="video/mp4">
   </video>
   <div class="hero-over"></div>
   
